@@ -9,39 +9,33 @@ namespace MikeNspired.XRIStarterKit
     // 좀비 캐릭터 AI를 제어하는 클래스
     public class EnemyControl : MonoBehaviour, IEnemy
     {
-        [Header("Health & Effects")]
+        [Header("References")]
         [SerializeField] private EnemyHealth enemyHealth; // 체력 관리 컴포넌트
         [SerializeField] private NPCSoundController soundController; // 사운드 재생 컨트롤러
         [SerializeField] private DamageText damageText; // 데미지 텍스트 프리팹 (ex. "10" 같은 숫자 뜨는 것)
         [SerializeField] private Transform damageTextSpawn; // 데미지 텍스트가 생성될 위치
-
-        [Header("Movement Settings")]
-        [SerializeField] private float maxSpeed = 1f; // 최대 이동 속도
-        [SerializeField] private float timeToMaxSpeed = 2f; // 가속 시간 (0 → maxSpeed까지 걸리는 시간)
-
-        [Header("Emerge & Sink Settings")]
-        [SerializeField] private float startAnimationDelay = 1f; // 등장 후 애니메이션 재생까지 딜레이
         [SerializeField] private Animator animator; // 애니메이터 컴포넌트
+        [SerializeField] private GameObject player; // 플레이어 오브젝트
 
-        [Header("Other Settings")]
+
+        [Header("Combat")]
         //[SerializeField] private float attackRange = 0.5f; // 공격 가능한 거리
         [SerializeField] private float screamChance = 0.05f; // 접근 중 비명을 지를 확률
-        [SerializeField] private float hitAnimationChance = 1f; // 피격 시 리액션 애니메이션 확률
-        public GameObject player; // 플레이어 오브젝트
+        [SerializeField] private float hitAnimationChance = 50f; // 피격 시 리액션 애니메이션 확률
+        [SerializeField] private float targetDistance = 2f; // 목표지점 도착 판정 거리
+        [SerializeField] private Transform movePosition; // 목표지점(적이 이동할 위치)
+        private float arrivedTimer = 0f;
 
-        private NavMeshAgent navMeshAgent;
+
         float distance; // 목표지점과의 거리
-        public float targetDistance = 2f; // 목표지점 도착 판정 거리
-        public Transform movePosition; // 목표지점(적이 이동할 위치)
+
         private bool hasAimed = false;
 
-
-        private float arrivedTimer = 0f;
+        private NavMeshAgent navMeshAgent;
         public GameObject bulletPrefab;
         public Transform firePoint;
         public float bulletForce = 500f;
         private List<GameObject> bulletPool = new List<GameObject>();
-        public Animator Deatanimator; // 죽음 애니메이션용 (선택사항)
         public GameObject deathEffect; // 죽었을 때 이펙트 프리팹 (선택사항)
 
         // 내부 상태 제어 변수
@@ -146,7 +140,7 @@ namespace MikeNspired.XRIStarterKit
                     bullet.SetActive(true);
 
                     // 총알 발사(Bullet 스크립트의 Fire 호출)
-                    Bullet bulletScript = bullet.GetComponent<Bullet>();
+                    EnemyBullet bulletScript = bullet.GetComponent<EnemyBullet>();
                     if (bulletScript != null)
                     {
                         bulletScript.Fire(firePoint.forward, bulletForce);
@@ -189,9 +183,9 @@ namespace MikeNspired.XRIStarterKit
             isDead = true;
 
         // 죽음 애니메이션 실행
-        if (Deatanimator != null)
+        if (animator != null)
         {
-            Deatanimator.SetTrigger("Die");
+            animator.SetTrigger("Die");
         }
 
         // 이펙트 생성

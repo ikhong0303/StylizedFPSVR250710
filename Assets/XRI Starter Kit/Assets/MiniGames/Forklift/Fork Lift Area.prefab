@@ -4579,15 +4579,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b90ebdf69f327428a53d9825e8b55d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  liftAudio: {fileID: 3441031283309107830}
-  tiltAudio: {fileID: 3441031283381066743}
-  forkRiser: {fileID: 3441031284655108663}
-  forks: {fileID: 8425272932881240662}
-  tiltSpeed: 0.5
-  liftSpeed: 0.2
-  forksMaxHeight: 0.6
-  forksRigidBody: {fileID: 8425272932881240661}
-  rotationRigidBody: {fileID: 3441031284780655686}
+  liftAudio: {fileID: 0}
+  tiltAudio: {fileID: 0}
+  forkRiser: {fileID: 0}
+  forks: {fileID: 0}
+  tiltSpeed: 5
+  liftSpeed: 0.5
+  forksMaxHeight: 0
+  forksRigidBody: {fileID: 0}
+  rotationRigidBody: {fileID: 0}
   isActive: 0
 --- !u!1 &3441031284634534276
 GameObject:

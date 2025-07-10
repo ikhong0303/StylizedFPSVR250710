@@ -42317,10 +42317,6 @@ PrefabInstance:
       propertyPath: movePosition
       value: 
       objectReference: {fileID: 650154839}
-    - target: {fileID: 4227524276864915945, guid: e07aeb5023a6d3742bdc32f565fa780e, type: 3}
-      propertyPath: maxHealth
-      value: 700
-      objectReference: {fileID: 0}
     - target: {fileID: 4806454881976943389, guid: e07aeb5023a6d3742bdc32f565fa780e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -11.498299

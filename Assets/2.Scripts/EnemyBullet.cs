@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 
-    public class Bullet : MonoBehaviour
+    public class EnemyBullet : MonoBehaviour
     {    /// <summary>
          /// 총알을 지정된 방향과 힘으로 발사한다.
          /// </summary>

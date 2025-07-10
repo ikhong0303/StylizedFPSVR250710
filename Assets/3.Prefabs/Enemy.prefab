@@ -6726,8 +6726,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5868154081375436308}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6393573, y: 0.65097475, z: 0.28989175, w: 0.28881985}
-  m_LocalPosition: {x: 0.001, y: -0.011, z: 0.039}
+  m_LocalRotation: {x: -0.66970164, y: 0.68520564, z: 0.20319015, w: 0.20175909}
+  m_LocalPosition: {x: 0.0012686988, y: 0.032124754, z: 0.07274045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6736,7 +6736,7 @@ Transform:
   - {fileID: 149680671523886604}
   - {fileID: 532596790679274746}
   m_Father: {fileID: 8637453286007895837}
-  m_LocalEulerAnglesHint: {x: -48.309, y: 179.54, z: -88.762}
+  m_LocalEulerAnglesHint: {x: -33.277, y: 179.703, z: -88.6}
 --- !u!1 &6479111915223781773
 GameObject:
   m_ObjectHideFlags: 0
@@ -12958,15 +12958,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -9.16
+      value: -11.498299
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.13
+      value: -0.22787857
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.38
+      value: 2.6161814
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12998,7 +12998,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_Name
-      value: Zombie
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
       propertyPath: m_IsActive
@@ -13410,18 +13410,16 @@ MonoBehaviour:
   soundController: {fileID: 557327564375443384}
   damageText: {fileID: 6233259730247143304, guid: 95cc1c6ad5af1c74bbdc68e8f980413d, type: 3}
   damageTextSpawn: {fileID: 597378498879819772}
-  maxSpeed: 1
-  timeToMaxSpeed: 2
-  startAnimationDelay: 0.4
   animator: {fileID: 1464753908647745895}
+  player: {fileID: 0}
   screamChance: 0.05
   hitAnimationChance: 0.1
-  player: {fileID: 0}
   targetDistance: 2
   movePosition: {fileID: 0}
   bulletPrefab: {fileID: 8627982499834681759, guid: 226681831d3361f4d88b9b701a121dba, type: 3}
   firePoint: {fileID: 2024634700424802066}
   bulletForce: 500
+  deathEffect: {fileID: 0}
 --- !u!114 &4227524276864915945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13434,7 +13432,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da2853eae5655464db1654f9ef12c8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 60
+  maxHealth: 700
+  currentHealth: 0
   damageCooldown: 0.1
 --- !u!114 &1036569862983616583
 MonoBehaviour:
