@@ -97,13 +97,11 @@ public class EnemyNav : MonoBehaviour, IDamageable
             Vector3 lookPos = player.transform.position;
             lookPos.y = transform.position.y;
             transform.LookAt(lookPos);
-            print("멈춰있음, 플레이어 바라봄");
 
             if (!hasAimed)
             {
       
                 hasAimed = true;
-                print("Aiming 애니메이션 트리거 활성화");
 
             }
         }
@@ -151,12 +149,7 @@ public class EnemyNav : MonoBehaviour, IDamageable
                 bullet.transform.rotation = firePoint.rotation;
                 bullet.SetActive(true);
 
-                // 총알 발사(Bullet 스크립트의 Fire 호출)
-                Bullet bulletScript = bullet.GetComponent<Bullet>();
-                if (bulletScript != null)
-                {
-                    bulletScript.Fire(firePoint.forward, bulletForce);
-                }
+
             }
         }
     }
