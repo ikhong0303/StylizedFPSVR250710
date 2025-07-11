@@ -34,4 +34,15 @@ using System.Collections;
             yield return new WaitForSeconds(seconds);
             gameObject.SetActive(false); // 오브젝트를 비활성화 (Destroy 대신)
         }
+
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            var health = other.gameObject.GetComponent<PlayerHealth>();
+            if (health != null)
+                health.TakeDamage(10f);
+        }
     }
+
+}

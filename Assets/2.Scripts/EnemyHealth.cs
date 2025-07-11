@@ -8,7 +8,7 @@ namespace MikeNspired.XRIStarterKit
     /// </summary>
     public class EnemyHealth : MonoBehaviour
     {
-        [SerializeField] private float maxHealth = 5; // 최대 체력
+        [SerializeField] private float maxHealth = 100; // 최대 체력
         [SerializeField] private float currentHealth; // 현재 체력
 
         private IEnemy enemy; // Die()를 호출하기 위한 인터페이스 참조

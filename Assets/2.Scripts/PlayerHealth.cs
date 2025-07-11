@@ -6,6 +6,10 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float maxHealth = 100f;
     private float currentHealth;
 
+    [SerializeField] private float damageCooldown = 0.1f; // 데미지를 연속으로 받지 않게 하는 쿨타임
+    private float lastDamageTime;
+    [SerializeField] private PlayerHitEffect hitEffect; // ★ Inspector에서 직접 할당
+
     public event Action<float> OnTakeDamage; // 데미지 받으면(실제값) 알림
     public event Action OnDie;               // 사망시 알림 (필요시)
 
@@ -14,6 +18,9 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         currentHealth = maxHealth;
+        lastDamageTime = -damageCooldown;     // 시작하자마자 바로 피격 가능하게 설정
+        //hitEffect = GetComponent<PlayerHitEffect>();
+
     }
 
     // 외부에서 체력 깎기
@@ -21,11 +28,20 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isDead) return;
 
+        // 쿨다운이 지나지 않았다면 무시
+        if (Time.time - lastDamageTime < damageCooldown)
+            return;
+
+        lastDamageTime = Time.time;
+
         currentHealth -= damage;
         currentHealth = Mathf.Max(currentHealth, 0);
 
-        OnTakeDamage?.Invoke(damage);
+        if (hitEffect != null)
+            hitEffect.ShowHitEffect();
 
+        OnTakeDamage?.Invoke(damage);
+        Debug.Log("아프다");
         if (currentHealth <= 0)
             Die();
     }

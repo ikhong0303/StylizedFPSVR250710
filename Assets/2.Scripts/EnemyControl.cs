@@ -16,6 +16,7 @@ namespace MikeNspired.XRIStarterKit
         [SerializeField] private Transform damageTextSpawn; // 데미지 텍스트가 생성될 위치
         [SerializeField] private Animator animator; // 애니메이터 컴포넌트
         [SerializeField] private GameObject player; // 플레이어 오브젝트
+        [SerializeField] private SkinnedMeshRenderer bodyRenderer; // 하위에 있는 메쉬 렌더러 Drag&Drop
 
 
         [Header("Combat")]
@@ -37,6 +38,9 @@ namespace MikeNspired.XRIStarterKit
         public float bulletForce = 500f;
         private List<GameObject> bulletPool = new List<GameObject>();
         public GameObject deathEffect; // 죽었을 때 이펙트 프리팹 (선택사항)
+
+        private Material hitFlashMaterial;     // 원본 머티리얼 복사본 저장
+        private Coroutine hitFlashRoutine;
 
         // 내부 상태 제어 변수
         private bool willScream;
@@ -150,7 +154,7 @@ namespace MikeNspired.XRIStarterKit
         }
 
 
-        #region Initialization & Emergence
+        
         void Movement()
         {
             navMeshAgent.SetDestination(movePosition.position);
@@ -168,7 +172,7 @@ namespace MikeNspired.XRIStarterKit
             isAttacking = false;
 
         }
-        #endregion
+        
 
 
 
@@ -198,6 +202,8 @@ namespace MikeNspired.XRIStarterKit
         Destroy(gameObject, 5f);
         }
 
+
+
         // 데미지를 받았을 때 반응
         private void OnEnemyTakeDamage(float damage)
         {
@@ -211,7 +217,34 @@ namespace MikeNspired.XRIStarterKit
             if (UnityEngine.Random.value <= hitAnimationChance)
                 animator.SetTrigger(Hit);
 
+            FlashHitColor(0.1f);
 
+        }
+
+        public void FlashHitColor(float duration = 0.2f)
+        {
+            if (bodyRenderer == null) return;
+
+            // 기존 코루틴 있으면 중지
+            if (hitFlashRoutine != null)
+                StopCoroutine(hitFlashRoutine);
+
+            hitFlashRoutine = StartCoroutine(HitFlashRoutine(duration));
+        }
+
+        private IEnumerator HitFlashRoutine(float duration)
+        {
+            // 1. 머티리얼 원본 저장(복사본)
+            if (hitFlashMaterial == null)
+                hitFlashMaterial = bodyRenderer.material; // material은 인스턴스 복제본!
+
+            // 2. 빨갛게
+            hitFlashMaterial.color = new Color(2f, 0f, 0f);
+
+            yield return new WaitForSeconds(duration);
+
+            // 3. 원래 색상으로(보통은 원래 색상 저장해두는 게 안전)
+            hitFlashMaterial.color = Color.white;
         }
 
 
