@@ -13,18 +13,18 @@ public class HolsterGun : MonoBehaviour
         grabInteractable = GetComponent<XRGrabInteractable>();
     }
 
-    // È¦½ºÅÍ¿¡ ÁøÀÔÇßÀ» ¶§ È£ÃâµÊ
+    // È¦ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½ï¿½
     public void EnterHolster(HolsterZone holster)
     {
         holsterTransform = holster.transform;
-        // ¼Õ¿¡ µé°í ÀÖÁö ¾Ê°í, ÀÌ¹Ì È¦½ºÅÍ ÁßÀÌ ¾Æ´Ï¸é ¼ö³³
+        // ï¿½Õ¿ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½, ï¿½Ì¹ï¿½ È¦ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (!grabInteractable.isSelected && !isInHolster)
         {
             Holster();
         }
     }
 
-    // È¦½ºÅÍ¿¡¼­ ³ª°¬À» ¶§
+    // È¦ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     public void ExitHolster(HolsterZone holster)
     {
         if (isInHolster)
@@ -34,30 +34,38 @@ public class HolsterGun : MonoBehaviour
         }
     }
 
-    // ½ÇÁ¦ È¦½ºÅÍ¿¡ ³Ö´Â ÇÔ¼ö
+    // ï¿½ï¿½ï¿½ï¿½ È¦ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½Ö´ï¿½ ï¿½Ô¼ï¿½
     private void Holster()
     {
         isInHolster = true;
-        // ÃÑÀÇ ºÎ¸ğ¸¦ È¦½ºÅÍ TransformÀ¸·Î º¯°æ (À§Ä¡/È¸Àü °íÁ¤)
         transform.SetParent(holsterTransform);
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
 
-        // XRGrabInteractable ºñÈ°¼ºÈ­ (¼ö³³ Áß¿¡´Â ¼ÕÀ¸·Î ÀâÀ» ¼ö ¾ø°Ô ÇÏ·Á¸é)
-        //grabInteractable.enabled = false;
-
-        // Äİ¶óÀÌ´õ µîµµ ÇÊ¿ä½Ã ²ø ¼ö ÀÖÀ½
-        //GetComponent<Collider>().enabled = false;
+        // ì¶”ê°€! Rigidbodyë¥¼ Kinematicìœ¼ë¡œ ë³€ê²½
+        var rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;   // ìˆ˜ë‚© ì¤‘ì—ëŠ” ë¬¼ë¦¬ ì‹œë®¬ë ˆì´ì…˜ ì¤‘ë‹¨
+            rb.linearVelocity = Vector3.zero;    // í˜¹ì‹œ ë‚¨ì•„ìˆë˜ ì†ë„ ì œê±°
+            rb.angularVelocity = Vector3.zero;
+        }
     }
 
-    // ¼ÕÀ¸·Î ´Ù½Ã ÁıÀ» ¶§
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     public void Unholster()
     {
         isInHolster = false;
-        transform.SetParent(null); // ¾À ·çÆ®·Î Ç®±â (È¤Àº XR OriginÀ¸·Î ºÙ¿©µµ µÊ)
-        //grabInteractable.enabled = true;
-        //GetComponent<Collider>().enabled = true;
+        transform.SetParent(null);
+
+        // ë‹¤ì‹œ ë¬¼ë¦¬ ì ìš©
+        var rb = GetComponent<Rigidbody>();
+        if (rb != null)
+            rb.isKinematic = false;    // ì†ì— ì¥ë©´ ë‹¤ì‹œ ë¬¼ë¦¬ ë™ì‘
+
+        // grabInteractable.enabled = true; ë“± í•„ìš”í•œ ê¸°ëŠ¥ ì¶”ê°€
     }
+
 
     private void OnEnable()
     {
@@ -72,7 +80,7 @@ public class HolsterGun : MonoBehaviour
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
-        // È¦½ºÅÍ¿¡¼­ ²¨³ÂÀ¸¸é Unholster Ã³¸®
+        // È¦ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Unholster Ã³ï¿½ï¿½
         if (isInHolster)
             Unholster();
     }

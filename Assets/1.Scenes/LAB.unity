@@ -1474,6 +1474,63 @@ Transform:
   - {fileID: 2051885668}
   m_Father: {fileID: 920049973}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &70875023
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.8079547
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.19515786
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.38336074
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.18494427
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5653518
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.79543865
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.115975924
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 1.4100001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 154.819
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122321687098915406, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -289.509
+      objectReference: {fileID: 0}
+    - target: {fileID: 5258201393683879230, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
+      propertyPath: m_Name
+      value: HandGun Infinte Ammo
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0764ad830f18eb04eadc55fac2938631, type: 3}
 --- !u!114 &72466966 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7032912722909253523, guid: 825faa7af51c8dd4599e4a67af5e543a, type: 3}
@@ -57175,6 +57232,10 @@ PrefabInstance:
       propertyPath: interactionRadius
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 2181477916111077189, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
+      propertyPath: m_SelectActionTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2381360703240010213, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.81
@@ -57214,6 +57275,10 @@ PrefabInstance:
     - target: {fileID: 2381360703240010213, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3862897019311740664, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
+      propertyPath: rayCastMask.m_Bits
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 5118898103383572179, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: rayCastMask.m_Bits
@@ -57270,6 +57335,10 @@ PrefabInstance:
     - target: {fileID: 9012738149223321723, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_Name
       value: Complete XR Origin Set Up
+      objectReference: {fileID: 0}
+    - target: {fileID: 9175709455998509530, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
+      propertyPath: m_SelectActionTrigger
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -59292,3 +59361,4 @@ SceneRoots:
   - {fileID: 1571696951}
   - {fileID: 1765929898}
   - {fileID: 583312348}
+  - {fileID: 70875023}
