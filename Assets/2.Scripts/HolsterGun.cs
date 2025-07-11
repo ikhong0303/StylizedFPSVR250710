@@ -13,18 +13,17 @@ public class HolsterGun : MonoBehaviour
         grabInteractable = GetComponent<XRGrabInteractable>();
     }
 
-    // Ȧ���Ϳ� �������� �� ȣ���
+    // 홀스터에 진입
     public void EnterHolster(HolsterZone holster)
     {
         holsterTransform = holster.transform;
-        // �տ� ��� ���� �ʰ�, �̹� Ȧ���� ���� �ƴϸ� ����
         if (!grabInteractable.isSelected && !isInHolster)
         {
             Holster();
         }
     }
 
-    // Ȧ���Ϳ��� ������ ��
+    // 홀스터에서 나감
     public void ExitHolster(HolsterZone holster)
     {
         if (isInHolster)
@@ -34,7 +33,7 @@ public class HolsterGun : MonoBehaviour
         }
     }
 
-    // ���� Ȧ���Ϳ� �ִ� �Լ�
+    // 실제 홀스터 고정 동작
     private void Holster()
     {
         isInHolster = true;
@@ -42,30 +41,27 @@ public class HolsterGun : MonoBehaviour
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
 
-        // 추가! Rigidbody를 Kinematic으로 변경
+        // 수납 중 물리 비활성화
         var rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.isKinematic = true;   // 수납 중에는 물리 시뮬레이션 중단
-            rb.linearVelocity = Vector3.zero;    // 혹시 남아있던 속도 제거
+            rb.isKinematic = true;
+            rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
     }
 
-    // ������ �ٽ� ���� ��
+    // 손에 쥐면 꺼내기
     public void Unholster()
     {
         isInHolster = false;
         transform.SetParent(null);
 
-        // 다시 물리 적용
+        // 다시 물리 활성화
         var rb = GetComponent<Rigidbody>();
         if (rb != null)
-            rb.isKinematic = false;    // 손에 쥐면 다시 물리 동작
-
-        // grabInteractable.enabled = true; 등 필요한 기능 추가
+            rb.isKinematic = false;
     }
-
 
     private void OnEnable()
     {
@@ -80,7 +76,6 @@ public class HolsterGun : MonoBehaviour
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
-        // Ȧ���Ϳ��� �������� Unholster ó��
         if (isInHolster)
             Unholster();
     }

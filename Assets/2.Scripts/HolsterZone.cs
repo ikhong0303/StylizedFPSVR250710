@@ -2,13 +2,10 @@ using UnityEngine;
 
 public class HolsterZone : MonoBehaviour
 {
-    public enum HolsterType { Left, Right }
-    public HolsterType holsterType; // Inspector에서 선택 (왼/오른쪽 구분)
-
     private void OnTriggerEnter(Collider other)
     {
-        // 총이 들어오면 HolsterableGun 스크립트가 붙어있는지 체크
-        HolsterGun gun = other.GetComponent<HolsterGun>();
+        // HolsterTrigger 오브젝트(자식)에 콜라이더가 있을 경우 부모에서 HolsterGun 찾기
+        var gun = other.GetComponentInParent<HolsterGun>();
         if (gun != null)
         {
             gun.EnterHolster(this);
@@ -17,7 +14,7 @@ public class HolsterZone : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        HolsterGun gun = other.GetComponent<HolsterGun>();
+        var gun = other.GetComponentInParent<HolsterGun>();
         if (gun != null)
         {
             gun.ExitHolster(this);
