@@ -31,7 +31,7 @@ public class PlayerHealth : MonoBehaviour
         // 쿨다운이 지나지 않았다면 무시
         if (Time.time - lastDamageTime < damageCooldown)
             return;
-
+         
         lastDamageTime = Time.time;
 
         currentHealth -= damage;
