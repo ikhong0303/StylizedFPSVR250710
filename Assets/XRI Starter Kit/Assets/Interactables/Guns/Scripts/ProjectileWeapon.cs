@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -15,142 +16,102 @@ namespace MikeNspired.XRIStarterKit
     // ProjectileWeapon: VR에서 사용하는 총기 발사 및 반동, 탄창, 이펙트 제어
     public class ProjectileWeapon : MonoBehaviour
     {
-        [Header("필수 참조")]
-        [SerializeField] private Transform firePoint;            // 총알이 발사되는 위치
-        [SerializeField] private Rigidbody projectilePrefab;     // 발사될 총알 프리팹
+        [Header("필수")]
+        [SerializeField] private Transform firePoint;              // 총알이 나가는 위치
+        [SerializeField] private Rigidbody projectilePrefab;       // 발사될 총알 프리팹
+        [SerializeField] private AudioSource fireAudio;            // 발사 사운드
         [SerializeField] private ParticleSystem cartridgeEjection; // 탄피 이펙트
-        [SerializeField] private AudioSource fireAudio;          // 발사 사운드
-        [SerializeField] private AudioSource outOfAmmoAudio;     // 탄약 없음 사운드
-        [SerializeField] private MatchTransform bulletFlash;     // 총구 섬광
-        [SerializeField] private GunCocking gunCocking;          // 장전 상태 제어 스크립트
+        [SerializeField] private MatchTransform bulletFlash;       // 총구 섬광
+        [SerializeField] private Transform cylinderTransform;      // 실린더(회전용 부모)
+        [SerializeField] private List<GameObject> bullets;         // 실린더 안에 보이는 총알 오브젝트(6개 등)
 
         [Header("설정")]
-        public MagazineAttachPoint magazineAttach = null; // 탄창 시스템
-        public float recoilAmount = -0.03f;                // 반동 이동 거리
-        public float recoilRotation = 1;                   // 반동 회전
-        public float recoilTime = 0.06f;                   // 반동 지속 시간
-        public int bulletsPerShot = 1;                     // 한 번에 발사할 총알 수
-        public float bulletSpreadAngle = 1;                // 총알 퍼짐 각도
-        public float bulletSpeed = 150;                    // 총알 속도
-        public bool infiniteAmmo = false;                  // 무한 탄약 여부
-        public float hapticDuration = 0.1f;                // 햅틱 지속 시간
-        public float hapticStrength = 0.5f;                // 햅틱 강도
+        [SerializeField] private float bulletSpeed = 150f;         // 총알 속도
+        [SerializeField] private float cylinderAngle = 60f;        // 실린더 회전 각도
+        [SerializeField] private float cylinderRotateDuration = 0.2f;   // ★ 부드러운 회전 지속시간
 
-        [Header("자동 발사")]
-        public float fireSpeed = 0.25f;    // 자동 발사 속도 (초당 발사 간격)
-        public bool automaticFiring = false; // 자동 발사 여부
+        public float recoilAmount = -0.03f;                        // 반동 이동 거리
+        public float recoilRotation = 1;                           // 반동 회전
+        public float recoilTime = 0.06f;                           // 반동 지속 시간
+        public float hapticDuration = 0.1f;                        // 햅틱 지속 시간
+        public float hapticStrength = 0.5f;                        // 햅틱 강도
 
-        private XRGrabInteractable interactable;  // XR 인터랙션용 컴포넌트
-        private XRBaseInteractor controller;      // 잡고 있는 컨트롤러
-        private Collider[] gunColliders;          // 총기의 콜라이더 목록
-        private bool gunCocked, isFiring;         // 장전 여부, 트리거 눌림 여부
-        private float fireTimer;                  // 발사 간격 타이머
+        [Header("재장전 (Tilt Reload)")]
+        [SerializeField] private float reloadAngle = 60f;      // 아래로 얼마나 기울이면 재장전되는지 (degree)
+        [SerializeField] private float reloadCooldown = 1f;    // 재장전 연타 방지 쿨타임(초)
+
+        // XR
+        private XRGrabInteractable interactable;
+        private XRBaseInteractor controller;
+        private Collider[] gunColliders;
+
+        // 상태
+        private int currentBulletIndex = 0;
+        private bool isRecoiling = false;
+        private bool isCylinderRotating = false;   // 회전 중엔 발사 금지
+        private Transform recoilTracker;
+        private Quaternion startingRotation;
+        private Vector3 endOfRecoilPosition;
+        private Quaternion endOfRecoilRotation;
+        private float timer;
+        private Vector3 controllerToAttachDelta;
+        private float lastReloadTime = -99f;                   // 마지막 재장전 시점
 
         // 이벤트
         public UnityEvent BulletFiredEvent, OutOfAmmoEvent, FiredLastBulletEvent;
 
-        void Awake()
+        private void Awake()
         {
-            OnValidate(); // 컴포넌트 자동 연결
-
-            // 트리거 작동시 발사
-            interactable.activated.AddListener(_ => TryFire(true));
-            interactable.deactivated.AddListener(_ => TryFire(false));
-
-            // 잡았을 때 반동 설정, 놓으면 반동 정리
+            interactable = GetComponent<XRGrabInteractable>();
+            interactable.activated.AddListener(_ => FireGun());
             interactable.selectEntered.AddListener(SetupRecoilVariables);
             interactable.selectExited.AddListener(DestroyRecoilTracker);
-
-            if (gunCocking)
-                gunCocking.GunCockedEvent.AddListener(() => gunCocked = true);
         }
 
-        void OnValidate()
+        private void FixedUpdate()
         {
-            // 필요한 컴포넌트가 빠져 있으면 자동으로 찾기
-            if (!gunCocking) gunCocking = GetComponentInChildren<GunCocking>();
-            if (!interactable) interactable = GetComponent<XRGrabInteractable>();
-        }
-
-        // RecoilUpdate를 렌더 전에 등록
-        void OnEnable() => Application.onBeforeRender += RecoilUpdate;
-        void OnDisable() => Application.onBeforeRender -= RecoilUpdate;
-
-        void Update()
-        {
-            if (!automaticFiring) return;
-
-            // 자동 발사 모드: 트리거를 계속 누르고 있을 때 일정 간격으로 발사
-            if (isFiring && fireTimer >= fireSpeed)
+            // XRGrabInteractable이 손에 쥐어진 상태일 때만
+            if (interactable.isSelected && controller != null)
             {
-                FireGun();
-                fireTimer = 0f;
+                // 컨트롤러 up 방향
+                var controllerUp = controller.transform.up;
+
+                // 월드 다운벡터와 이루는 각도
+                float angle = Vector3.Angle(controllerUp, Vector3.down);
+
+                // (참고) 총구 기준 회전이라면 firePoint.up, firePoint.forward 기준으로 바꿔도 됨
+
+                if (angle < reloadAngle && Time.time - lastReloadTime > reloadCooldown)
+                {
+                    // 현재 각도가 아래로 충분히 기울었으면 재장전
+                    Reload();
+                    lastReloadTime = Time.time;
+                }
             }
-            fireTimer += Time.deltaTime;
         }
 
-        private void TryFire(bool state)
-        {
-            isFiring = state;
-
-            // 자동 발사가 아닐 경우, 누를 때마다 1회 발사
-            if (state && !automaticFiring) FireGun();
-        }
-
-        // 실제 발사 처리
         public void FireGun()
         {
-            if (bulletsPerShot < 1) return;
-
-            // 탄약 없거나 장전 안 되어 있으면 발사 안 됨
-            if (magazineAttach && !infiniteAmmo && (CheckIfGunCocked() || !magazineAttach.Magazine || !magazineAttach.Magazine.UseAmmo()))
+            if (isCylinderRotating) return; // 회전 중에는 중복 발사 금지
+            if (currentBulletIndex >= bullets.Count)
             {
-                OutOfAmmoEvent.Invoke();
-                outOfAmmoAudio.PlayOneShot(outOfAmmoAudio.clip);
-                gunCocked = false;
+                OutOfAmmoEvent?.Invoke();
+                Debug.Log("총알 없음! 재장전 필요");
                 return;
             }
 
-            // GunCocking이 있을 경우 장전 상태 확인
-            if (gunCocking && !gunCocked)
-            {
-                OutOfAmmoEvent.Invoke();
-                outOfAmmoAudio.PlayOneShot(outOfAmmoAudio.clip);
-                return;
-            }
+            // 총알 비활성화
+            bullets[currentBulletIndex].SetActive(false);
 
-            // 여러 발 발사 (샷건, 산탄총 등)
-            for (int i = 0; i < bulletsPerShot; i++)
-            {
-                // 퍼짐 적용한 발사 방향 계산
-                Vector3 shotDirection = Vector3.Slerp(
-                    firePoint.forward,
-                    UnityEngine.Random.insideUnitSphere,
-                    bulletSpreadAngle / 180f
-                );
+            // 발사체 생성 및 힘 적용
+            var bullet = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+            bullet.AddForce(firePoint.forward * bulletSpeed, ForceMode.VelocityChange);
 
-                var bullet = Instantiate(projectilePrefab);
-                IgnoreColliders(bullet); // 총알과 총기 충돌 무시
+            // 사운드, 이펙트
+            fireAudio?.PlayOneShot(fireAudio.clip);
+            cartridgeEjection?.Play();
 
-                bullet.transform.SetPositionAndRotation(
-                    firePoint.position, Quaternion.LookRotation(shotDirection)
-                );
-                bullet.AddForce(bullet.transform.forward * bulletSpeed, ForceMode.VelocityChange);
-
-                // 햅틱 진동
-                controller.GetComponentInParent<HapticImpulsePlayer>().SendHapticImpulse(hapticStrength, hapticDuration);
-
-                BulletFiredEvent.Invoke(); // 발사 이벤트
-
-                StopAllCoroutines();
-                StartRecoil(); // 반동 실행
-            }
-
-            // 마지막 탄약 발사했을 경우
-            if (magazineAttach && magazineAttach.Magazine && magazineAttach.Magazine.CurrentAmmo == 0)
-                FiredLastBulletEvent.Invoke();
-
-            // 총구 섬광
+            // 총구 플래쉬
             if (bulletFlash)
             {
                 var flash = Instantiate(bulletFlash);
@@ -158,88 +119,114 @@ namespace MikeNspired.XRIStarterKit
                 flash.positionToMatch = firePoint;
             }
 
-            // 사운드 및 이펙트
-            fireAudio?.PlayOneShot(fireAudio.clip);
-            if (cartridgeEjection)
-                cartridgeEjection.Play();
+            // 햅틱(진동)
+            if (controller)
+            {
+                var haptic = controller.GetComponentInParent<HapticImpulsePlayer>();
+                haptic?.SendHapticImpulse(hapticStrength, hapticDuration);
+            }
+
+            BulletFiredEvent?.Invoke();
+
+            //// 실린더 회전
+            //if (cylinderTransform)
+            //    cylinderTransform.localRotation *= Quaternion.Euler(0, 0, -cylinderAngle);
+
+            // ▶ 실린더 회전을 부드럽게!
+            if (cylinderTransform)
+            {
+                float targetAngle = -(currentBulletIndex + 1) * cylinderAngle;
+                StartCoroutine(RotateCylinderSmooth(targetAngle, cylinderRotateDuration));
+            }
+
+            // 인덱스 증가
+            currentBulletIndex++;
+
+            // 마지막 총알이면 이벤트
+            if (currentBulletIndex == bullets.Count)
+                FiredLastBulletEvent?.Invoke();
+
+            // 반동
+            //StopAllCoroutines();
+            StartRecoil();
         }
 
-        // 총알이 총과 충돌하지 않도록 설정
-        private void IgnoreColliders(Component bullet)
+        // ★ 실린더(총알 그룹) 부드러운 회전 코루틴
+        private IEnumerator RotateCylinderSmooth(float targetAngle, float duration)
         {
-            gunColliders = GetComponentsInChildren<Collider>(true);
-            var bulletCollider = bullet.GetComponentInChildren<Collider>();
-            foreach (var c in gunColliders)
-                Physics.IgnoreCollision(c, bulletCollider);
+            isCylinderRotating = true;
+
+            float startAngle = cylinderTransform.localEulerAngles.z;
+            // 각도 차이 계산(0~360 기준으로 보정)
+            float endAngle = targetAngle;
+            if (endAngle - startAngle > 180f) startAngle += 360f;
+            if (startAngle - endAngle > 180f) endAngle += 360f;
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                float angle = Mathf.Lerp(startAngle, endAngle, elapsed / duration);
+                cylinderTransform.localEulerAngles = new Vector3(0, 0, angle);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            cylinderTransform.localEulerAngles = new Vector3(0, 0, endAngle);
+
+            isCylinderRotating = false;
         }
 
-        private bool CheckIfGunCocked() => gunCocking && !gunCocked;
+        public void Reload()
+        {
+            foreach (var bullet in bullets)
+                bullet.SetActive(true);
+            if (cylinderTransform)
+                cylinderTransform.localRotation = Quaternion.identity;
+            currentBulletIndex = 0;
+        }
 
-        #region 반동 시스템 (Recoil)
-
-        private Transform recoilTracker;
-        private Quaternion startingRotation;
-        private Vector3 endOfRecoilPosition;
-        private Quaternion endOfRecoilRotation;
-        private float timer;
-        private bool isRecoiling;
-        private Vector3 controllerToAttachDelta;
-
-        // 총을 잡았을 때 반동 트래커 설정
+        // ==== 아래는 반동 코드(원본 유지) ====
         private void SetupRecoilVariables(SelectEnterEventArgs args)
         {
             controller = args.interactorObject as XRBaseInteractor;
             StartCoroutine(SetupRecoil(interactable.attachEaseInTime));
         }
-
-        // 놓았을 때 반동 리셋
         private void DestroyRecoilTracker(SelectExitEventArgs args)
         {
             StopAllCoroutines();
             if (recoilTracker) Destroy(recoilTracker.gameObject);
             isRecoiling = false;
         }
-
-        // 반동용 트래커 생성
-        private IEnumerator SetupRecoil(float interactableAttachEaseInTime)
+        private System.Collections.IEnumerator SetupRecoil(float interactableAttachEaseInTime)
         {
-            var handReference = controller.GetComponentInParent<HandReference>();
-            if (!handReference) yield break;
-
+            if (controller == null) yield break;
             recoilTracker = new GameObject($"{name} Recoil Tracker").transform;
             recoilTracker.parent = controller.attachTransform;
             yield return null;
         }
-
         private void StartRecoil()
         {
             if (!recoilTracker) StartCoroutine(SetupRecoil(1));
-
             recoilTracker.localRotation = startingRotation;
             recoilTracker.localPosition = Vector3.zero;
             startingRotation = transform.localRotation;
-
             timer = 0f;
             controllerToAttachDelta = transform.position - recoilTracker.position;
             isRecoiling = true;
         }
-
-        // 프레임별 반동 계산 (BeforeRender에 등록됨)
-        [BeforeRenderOrder(101)]
+        private void OnEnable() => Application.onBeforeRender += RecoilUpdate;
+        private void OnDisable() => Application.onBeforeRender -= RecoilUpdate;
+        [UnityEngine.BeforeRenderOrder(101)]
         private void RecoilUpdate()
         {
             if (!isRecoiling) return;
-
             if (timer < recoilTime / 2f)
             {
-                // 총을 뒤로 밀고, 위로 살짝 회전
-                if (Math.Abs(recoilAmount) > 0.001f)
+                if (Mathf.Abs(recoilAmount) > 0.001f)
                 {
                     recoilTracker.position += transform.forward * recoilAmount * Time.deltaTime;
                     transform.position = recoilTracker.position + controllerToAttachDelta;
                 }
-
-                if (Math.Abs(recoilRotation) > 0.001f)
+                if (Mathf.Abs(recoilRotation) > 0.001f)
                     transform.Rotate(Vector3.right, -recoilRotation * Time.deltaTime, Space.Self);
 
                 endOfRecoilPosition = recoilTracker.localPosition;
@@ -247,20 +234,15 @@ namespace MikeNspired.XRIStarterKit
             }
             else
             {
-                // 원래 위치로 되돌아가기
-                float t = remap(recoilTime / 2f, recoilTime, 0f, 1f, timer);
+                float t = Mathf.InverseLerp(recoilTime / 2f, recoilTime, timer);
                 recoilTracker.localPosition = Vector3.Lerp(endOfRecoilPosition, Vector3.zero, t);
                 var newRotation = Quaternion.Lerp(endOfRecoilRotation, startingRotation, t);
-
                 transform.position = recoilTracker.position + controllerToAttachDelta;
                 transform.localRotation = newRotation;
             }
-
             timer += Time.deltaTime;
             if (timer > recoilTime)
                 isRecoiling = false;
         }
-
-        #endregion
     }
 }

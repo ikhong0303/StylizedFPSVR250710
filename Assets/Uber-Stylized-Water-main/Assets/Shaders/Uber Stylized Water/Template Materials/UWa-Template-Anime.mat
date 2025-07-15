@@ -273,15 +273,15 @@ Material:
     - _FresnelStrength: 1
     - _Fresnel_Opacity: 1
     - _Fresnel_Power: 10
-    - _InterSec_Dissolve: 1.88
+    - _InterSec_Dissolve: 2.67
     - _InterSec_Edge_Dissolve: 1
     - _InterSec_Edge_Fade: 0
-    - _InterSec_Foam_Distortion: 0.1
+    - _InterSec_Foam_Distortion: 1.22
     - _InterSec_Foam_Invert: 1
     - _InterSec_Foam_Scale: 3.75
     - _InterSec_Foam_Smooth: 0
     - _InterSec_GradientDissolve: 1
-    - _InterSec_Width: 0.45
+    - _InterSec_Width: 0.66
     - _IntersectionDistanceCutoff: 2.5
     - _IntersectionDistanceDepth: 0.5
     - _IntersectionFoamCutoff: 8.6
@@ -339,7 +339,7 @@ Material:
     - _ShoreFade: 0
     - _ShoreFadeHardness: 0.368
     - _ShoreFadeSmoothness: 0.2
-    - _ShoreFade_Smoothness: 0.2
+    - _ShoreFade_Smoothness: 0.09
     - _ShoreLineAmmount: 3.34
     - _ShoreLineCenterMask: 2.01
     - _ShoreLineCutoff: 0.66
@@ -370,7 +370,7 @@ Material:
     - _SurfaceDistortionScale: 1.48
     - _SurfaceDistortionStrength: 0.1
     - _SurfaceDistortion_Scale: 1
-    - _SurfaceDistortion_Strength: 0.2
+    - _SurfaceDistortion_Strength: 0.44
     - _SurfaceFoamDistortion: 0.1
     - _SurfaceFoamScale: 2.5
     - _SurfaceFomShaodwDepth: 24.99
@@ -426,7 +426,7 @@ Material:
     m_Colors:
     - _1st_Wave_Direction: {r: 1, g: 0, b: 0, a: 0}
     - _2nd_Wave_Direction: {r: -1, g: 0, b: 1, a: 0}
-    - _Color_Deep: {r: 0, g: 0.15005267, b: 0.645, a: 1}
+    - _Color_Deep: {r: 0, g: 0, b: 0, a: 1}
     - _Color_Shallow: {r: 0.12156862, g: 1, b: 0.9824349, a: 1}
     - _Deep_Color: {r: 0, g: 0.15303946, b: 1, a: 1}
     - _DistanceColor: {r: 1, g: 1, b: 1, a: 1}
@@ -467,7 +467,7 @@ Material:
     - _SurfaceFoamPanning: {r: 0, g: 0, b: 0, a: 0}
     - _SurfaceFoamShadowColor: {r: 0, g: 0, b: 0, a: 0.4745098}
     - _UnderwaterLayerColor: {r: 0.08870696, g: 0.39086497, b: 0.59599996, a: 0.21176471}
-    - _Underwater_Color: {r: 0.32941175, g: 0.6156863, b: 0.8117648, a: 0.37254903}
+    - _Underwater_Color: {r: 0, g: 0, b: 0, a: 0.36078432}
     - _Vector2: {r: 0, g: 0, b: 0, a: 0}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
     - _WaveDirection2nd: {r: 0, g: 0, b: 1, a: 0}

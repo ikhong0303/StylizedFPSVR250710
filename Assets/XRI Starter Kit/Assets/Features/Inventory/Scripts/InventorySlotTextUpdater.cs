@@ -11,37 +11,6 @@ namespace MikeNspired.XRIStarterKit
 
         private InventorySlot inventorySlot;
 
-        void Awake()
-        {
-            if (!inventorySlot)
-                inventorySlot = GetComponent<InventorySlot>();
-            inventorySlot.onSlotUpdated += CheckTypes;
-        }
-
-        private void CheckTypes(XRBaseInteractable currentSlotItem)
-        {
-            if (!currentSlotItem) return;
-
-            var projectile = currentSlotItem.GetComponent<ProjectileWeapon>();
-            if (projectile)
-                CheckAmmo(projectile);
-            else
-                HideText();
-        }
-
-        private void CheckAmmo(ProjectileWeapon projectile)
-        {
-            if (!projectile.magazineAttach)
-            {
-                SetTextToInfinity();
-            }
-            else
-            {
-                Magazine magazine = projectile.magazineAttach.Magazine;
-                if (magazine)
-                    SetText(magazine.CurrentAmmo.ToString(), magazine.MaxAmmo.ToString());
-            }
-        }
 
         private void SetText(string currentValue, string maxValue)
         {

@@ -7,36 +7,31 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 namespace MikeNspired.XRIStarterKit
 {
     /// <summary>
-    /// This component toggles certain child Transforms when an XRGrabInteractable is grabbed or released.
-    /// 
-    /// - <see cref="disableOnGrab"/> is disabled when grabbed and enabled when released.
-    /// - <see cref="enableOnGrab"/> is enabled when grabbed and disabled when released.
-    /// 
-    /// Additionally, if <see cref="moveAndDisableAfterFrameOnGrabColliders"/> is true, colliders on the 
-    /// target object are moved far away and then disabled, letting physics update before the object is hidden.
-    /// 
-    /// Implements <see cref="IReturnMovedColliders"/> so it can reset transforms if they’ve been moved.
+    /// XRGrabInteractable이 잡혔을 때/놓였을 때,
+    /// 지정한 자식 Transform들을 활성/비활성, 혹은 이동/비활성 처리해주는 스크립트.
+    /// (예: 칼집에서 칼을 뽑으면 칼집이 비활성화되고, 칼이 활성화되는 식)
     /// </summary>
     [RequireComponent(typeof(XRGrabInteractable))]
     public class OnGrabEnableDisable : MonoBehaviour, IReturnMovedColliders
     {
         [Header("Main References")]
-        [SerializeField] 
-        private XRGrabInteractable grabInteractable;
+        [SerializeField]
+        private XRGrabInteractable grabInteractable; // XR Grab 기능을 담당하는 컴포넌트 (자동 할당)
 
-        [Tooltip("Transform is disabled when grabbed, enabled when released.")]
-        [SerializeField] 
+        [Tooltip("잡았을 때 꺼지고, 놓으면 켜질 Transform (ex. 칼집)")]
+        [SerializeField]
         private Transform disableOnGrab;
 
-        [Tooltip("Transform is enabled when grabbed, disabled when released.")]
-        [SerializeField] 
+        [Tooltip("잡았을 때 켜지고, 놓으면 꺼질 Transform (ex. 칼)")]
+        [SerializeField]
         private Transform enableOnGrab;
 
         [Header("Settings")]
-        [Tooltip("If true, moves the transform offscreen and disables colliders after a short delay.")]
-        [SerializeField] 
+        [Tooltip("true면, Grab/Release 시 콜라이더를 멀리 보내서 비활성화 후 위치/콜라이더 원복")]
+        [SerializeField]
         private bool moveAndDisableAfterFrameOnGrabColliders = true;
 
+        // 잡고/놓았을 때 원래 위치 기억용
         private Vector3 disableOnGrabStartPosition;
         private Vector3 enableOnGrabStartPosition;
 
@@ -44,45 +39,46 @@ namespace MikeNspired.XRIStarterKit
         {
             OnValidate();
 
+            // 초기 위치 저장
             if (disableOnGrab)
                 disableOnGrabStartPosition = disableOnGrab.localPosition;
             if (enableOnGrab)
                 enableOnGrabStartPosition = enableOnGrab.localPosition;
 
+            // Grab/Release 이벤트 연결
             grabInteractable.selectEntered.AddListener(_ => OnGrab());
             grabInteractable.selectExited.AddListener(_ => OnRelease());
         }
 
- 
+        // 에디터에서 참조 자동 할당
         private void OnValidate()
         {
             if (!grabInteractable)
                 grabInteractable = GetComponent<XRGrabInteractable>();
         }
 
+        // Start 시, 초깃값 세팅 (비활성/활성 구분)
         private void Start()
         {
-            // Initialize GameObjects to their default active states
-            if (disableOnGrab) 
+            if (disableOnGrab)
                 disableOnGrab.gameObject.SetActive(true);
-            if (enableOnGrab) 
+            if (enableOnGrab)
                 enableOnGrab.gameObject.SetActive(false);
         }
 
+        // XR 오브젝트를 잡았을 때 호출됨
         private void OnGrab()
         {
-            // If we should move away & disable, use the coroutine approach
             if (moveAndDisableAfterFrameOnGrabColliders)
             {
                 StopAllCoroutines();
 
-                // Immediately enable the "enableOnGrab" object
+                // enableOnGrab 오브젝트 바로 활성화
                 EnableTransform(enableOnGrab, enableOnGrabStartPosition);
 
-                // Schedule the disabling of the "disableOnGrab" object
-                if(disableOnGrab)
+                // disableOnGrab 오브젝트는, 콜라이더 상태 복구 후 멀리 보냈다가 비활성화
+                if (disableOnGrab)
                 {
-                    // Reset colliders on the one about to be moved
                     var collidersTrigger = disableOnGrab.GetComponent<CollidersSetToTrigger>();
                     collidersTrigger?.ReturnToDefaultState();
 
@@ -91,24 +87,24 @@ namespace MikeNspired.XRIStarterKit
             }
             else
             {
-                // No coroutine approach => immediate toggling
+                // 그냥 바로 켜고/끄는 모드 (코루틴 미사용)
                 if (disableOnGrab)
                     disableOnGrab.gameObject.SetActive(false);
                 EnableTransform(enableOnGrab, enableOnGrabStartPosition);
             }
         }
 
-
+        // XR 오브젝트를 놓았을 때 호출됨
         private void OnRelease()
         {
             if (moveAndDisableAfterFrameOnGrabColliders)
             {
                 StopAllCoroutines();
 
-                // Immediately enable the "disableOnGrab" object
+                // disableOnGrab 오브젝트 바로 활성화
                 EnableTransform(disableOnGrab, disableOnGrabStartPosition);
 
-                // Schedule the disabling of the "enableOnGrab" object
+                // enableOnGrab 오브젝트는 콜라이더 복구 후 멀리 보냈다가 비활성화
                 if (enableOnGrab)
                 {
                     var collidersTrigger = enableOnGrab.GetComponent<CollidersSetToTrigger>();
@@ -119,7 +115,7 @@ namespace MikeNspired.XRIStarterKit
             }
             else
             {
-                // No coroutine approach => immediate toggling
+                // 바로 켜고/끄기
                 if (enableOnGrab)
                     enableOnGrab.gameObject.SetActive(false);
                 if (disableOnGrab)
@@ -128,21 +124,18 @@ namespace MikeNspired.XRIStarterKit
         }
 
         /// <summary>
-        /// Sets all tracked objects to their enabled states and resets positions/colliders.
+        /// 모든 오브젝트를 원래 상태로 복구 (위치/콜라이더 포함)
         /// </summary>
         public void EnableAll()
         {
             StopAllCoroutines();
 
-            // Bring back disableOnGrab if assigned
             if (disableOnGrab)
             {
                 disableOnGrab.gameObject.SetActive(true);
                 ResetTransformLocal(disableOnGrab, disableOnGrabStartPosition);
                 ResetCollidersToDefault(disableOnGrab);
             }
-
-            // Bring back enableOnGrab if assigned
             if (enableOnGrab)
             {
                 enableOnGrab.gameObject.SetActive(true);
@@ -152,7 +145,7 @@ namespace MikeNspired.XRIStarterKit
         }
 
         /// <summary>
-        /// Resets the transforms if they’ve been moved away.
+        /// 콜라이더 이동된거 복구 (IReturnMovedColliders용)
         /// </summary>
         public void ReturnMovedColliders()
         {
@@ -164,45 +157,42 @@ namespace MikeNspired.XRIStarterKit
         }
 
         /// <summary>
-        /// Coroutine that moves the object far away, waits for physics updates, and disables it.
+        /// 코루틴: 오브젝트를 멀리 이동, 비활성, 위치/콜라이더 원복
         /// </summary>
         private IEnumerator MoveDisableAndReturn(Transform objectToMove, Vector3 originalLocalPosition)
         {
             if (!objectToMove) yield break;
-            
-            // Temporarily set colliders to trigger
+
+            // 콜라이더 임시로 트리거로 바꿈 (충돌방지)
             var collidersTrigger = objectToMove.GetComponent<CollidersSetToTrigger>();
             collidersTrigger?.SetAllToTrigger();
 
             yield return PhysicsHelper.MoveAndDisable(objectToMove.gameObject);
 
-            // Reset local position and colliders
+            // 위치/콜라이더 복구
             ResetTransformLocal(objectToMove, originalLocalPosition);
             collidersTrigger?.ReturnToDefaultState();
         }
 
         #region Helper Methods
 
+        // 위치 원복
         private void ResetTransformLocal(Transform target, Vector3 localPos)
         {
             if (!target) return;
             target.localPosition = localPos;
         }
 
+        // 오브젝트 활성화 및 위치/콜라이더 초기화
         private void EnableTransform(Transform target, Vector3 startPos)
         {
             if (!target) return;
-
-            // Enable object
             target.gameObject.SetActive(true);
-
-            // Reset position
             target.localPosition = startPos;
-
-            // Reset any colliders
             ResetCollidersToDefault(target);
         }
 
+        // 콜라이더 상태 원복
         private void ResetCollidersToDefault(Transform target)
         {
             if (!target) return;
