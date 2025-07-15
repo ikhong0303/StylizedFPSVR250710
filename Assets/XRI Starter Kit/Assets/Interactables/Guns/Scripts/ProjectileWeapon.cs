@@ -70,20 +70,14 @@ namespace MikeNspired.XRIStarterKit
 
         private void FixedUpdate()
         {
-            // XRGrabInteractable이 손에 쥐어진 상태일 때만
             if (interactable.isSelected && controller != null)
             {
-                // 컨트롤러 up 방향
-                var controllerUp = controller.transform.up;
+                var gunForward = firePoint.forward.normalized;
+                float dot = Vector3.Dot(gunForward, Vector3.down); // 아래=+1, 위=-1
 
-                // 월드 다운벡터와 이루는 각도
-                float angle = Vector3.Angle(controllerUp, Vector3.down);
-
-                // (참고) 총구 기준 회전이라면 firePoint.up, firePoint.forward 기준으로 바꿔도 됨
-
-                if (angle < reloadAngle && Time.time - lastReloadTime > reloadCooldown)
+                // 140도 기준이면 0.766f, 아래든 위든 상관없이 장전
+                if (Mathf.Abs(dot) > 0.766f && Time.time - lastReloadTime > reloadCooldown)
                 {
-                    // 현재 각도가 아래로 충분히 기울었으면 재장전
                     Reload();
                     lastReloadTime = Time.time;
                 }

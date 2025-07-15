@@ -13412,6 +13412,7 @@ MonoBehaviour:
   damageTextSpawn: {fileID: 597378498879819772}
   animator: {fileID: 1464753908647745895}
   player: {fileID: 0}
+  bodyRenderer: {fileID: 6799485681741114557}
   screamChance: 0.05
   hitAnimationChance: 0.1
   targetDistance: 2
@@ -13534,6 +13535,11 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.1, z: 0}
+--- !u!137 &6799485681741114557 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1974243983493711947, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
+  m_PrefabInstance: {fileID: 4988101911385269494}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6960010873165761015 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2715566404302941441, guid: daf408adfbcff194b88d88c99663dd23, type: 3}
