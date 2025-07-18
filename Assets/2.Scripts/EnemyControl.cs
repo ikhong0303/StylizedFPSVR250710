@@ -1,78 +1,74 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
 namespace MikeNspired.XRIStarterKit
 {
-    // 좀비 캐릭터 AI를 제어하는 클래스
+    /// <summary>
+    /// 적(좀비) AI 행동 제어 스크립트
+    /// - 지정 지점까지 이동 → 도착 후 조준/사격 반복
+    /// - 사격 전 조준 레이저 연출 포함
+    /// </summary>
     public class EnemyControl : MonoBehaviour, IEnemy
     {
         [Header("References")]
-        [SerializeField] private EnemyHealth enemyHealth; // 체력 관리 컴포넌트
-        [SerializeField] private NPCSoundController soundController; // 사운드 재생 컨트롤러
-        [SerializeField] private DamageText damageText; // 데미지 텍스트 프리팹 (ex. "10" 같은 숫자 뜨는 것)
-        [SerializeField] private Transform damageTextSpawn; // 데미지 텍스트가 생성될 위치
-        [SerializeField] private Animator animator; // 애니메이터 컴포넌트
-        [SerializeField] private GameObject player; // 플레이어 오브젝트
-        [SerializeField] private SkinnedMeshRenderer bodyRenderer; // 하위에 있는 메쉬 렌더러 Drag&Drop
+        [SerializeField] private EnemyHealth enemyHealth;                  // 체력 관리 컴포넌트
+        [SerializeField] private NPCSoundController soundController;       // 사운드 재생 컨트롤러
+        [SerializeField] private DamageText damageText;                    // 데미지 텍스트 프리팹
+        [SerializeField] private Transform damageTextSpawn;                // 데미지 텍스트 스폰 위치
+        [SerializeField] private Animator animator;                        // 애니메이터
+        [SerializeField] private GameObject player;                        // 플레이어 오브젝트
+        [SerializeField] private SkinnedMeshRenderer bodyRenderer;         // 본체 메쉬 렌더러
 
 
         [Header("Combat")]
-        //[SerializeField] private float attackRange = 0.5f; // 공격 가능한 거리
-        [SerializeField] private float screamChance = 0.05f; // 접근 중 비명을 지를 확률
-        [SerializeField] private float hitAnimationChance = 50f; // 피격 시 리액션 애니메이션 확률
-        [SerializeField] private float targetDistance = 2f; // 목표지점 도착 판정 거리
-        [SerializeField] private Transform movePosition; // 목표지점(적이 이동할 위치)
+        [SerializeField] private float screamChance = 0.05f;               // 비명 확률
+        [SerializeField] private float hitAnimationChance = 50f;           // 피격 리액션 확률
+        [SerializeField] private float targetDistance = 2f;                // 목표 도달 거리
+        [SerializeField] private Transform movePosition;                   // 이동 목표 지점
         private float arrivedTimer = 0f;
 
+        float distance;                            // 목표와의 거리
+        private NavMeshAgent navMeshAgent;         // 네비게이션 에이전트(이동용)
+        public GameObject bulletPrefab;            // 적 총알 프리팹
+        public Transform firePoint;                // 총구 위치
+        public float bulletForce = 500f;           // 총알 힘
+        private List<GameObject> bulletPool = new List<GameObject>();   // 총알 풀
+        public GameObject laserTubePrefab;         // 원통(프리팹)
+        private GameObject activeLaserTube;
 
-        float distance; // 목표지점과의 거리
+        private Material hitFlashMaterial;         // 피격 플래시 머티리얼
+        private Coroutine hitFlashRoutine;         // 피격 코루틴
 
-        private bool hasAimed = false;
+        // --- 조준 레이저 ---
+        [Header("Aim Laser")]
+        public LineRenderer aimLaser;              // 조준 레이저(LineRenderer)
+        public Color laserColor = Color.red;       // 레이저 색상
+        public float laserWidth = 0.05f;           // 레이저 굵기
+        public float laserLength = 30f;            // 레이저 길이
 
-        private NavMeshAgent navMeshAgent;
-        public GameObject bulletPrefab;
-        public Transform firePoint;
-        public float bulletForce = 500f;
-        private List<GameObject> bulletPool = new List<GameObject>();
-        public GameObject deathEffect; // 죽었을 때 이펙트 프리팹 (선택사항)
+        // --- 상태머신 ---
+        enum EnemyState { Move, AimPrepare, AimLaser, Shoot }
+        EnemyState currentState = EnemyState.Move;
+        float stateTimer = 0f;                     // 상태 타이머
+        Vector3 aimDirection = Vector3.forward;    // 사격 방향
 
-        private Material hitFlashMaterial;     // 원본 머티리얼 복사본 저장
-        private Coroutine hitFlashRoutine;
-
-        // 내부 상태 제어 변수
-        private bool willScream;
-        private bool hasScreamed;
-        private float initialDistanceToPlayer;
-
-        private float accelerateTimer;
-        private bool isDead = false;
-        private bool isAttacking;
-        private bool isEmerging;
-        private bool isSinking;
-
-        // 애니메이터 파라미터 해시 (성능 최적화용)
-        private static readonly int Speed = Animator.StringToHash("Speed");
-        private static readonly int Scream = Animator.StringToHash("Scream");
-        private static readonly int Hit = Animator.StringToHash("Hit");
-        private static readonly int Attack = Animator.StringToHash("Attack");
-        //private static readonly int DissolveAmountHash = Shader.PropertyToID("_DissolveAmount");
-
-        // 전역 이벤트 (다른 시스템에서 구독 가능)
-        public static event Action<EnemyControl> OnZombieDied;
-        public static event Action OnZombieAttacked;
-
-
-
+        private bool isDead = false;               // 사망 여부
 
         private void Start()
         {
-            // 플레이어를 XR Origin으로 자동 탐색
             navMeshAgent = GetComponent<NavMeshAgent>();
-
-            // 데미지를 받았을 때 사운드 재생 및 리액션 설정
+            // 조준 레이저 기본 설정
+            if (aimLaser != null)
+            {
+                aimLaser.enabled = false;
+                aimLaser.startColor = laserColor;
+                aimLaser.endColor = laserColor;
+                aimLaser.startWidth = laserWidth;
+                aimLaser.endWidth = laserWidth;
+            }
+            // 피격 이벤트 연결
             if (enemyHealth != null)
             {
                 enemyHealth.OnTakeDamage += _ => soundController.PlayImpact();
@@ -80,205 +76,258 @@ namespace MikeNspired.XRIStarterKit
             }
         }
 
+        /// <summary>
+        /// 상태머신 메인 루프 (FixedUpdate)
+        /// </summary>
         private void FixedUpdate()
-        {
-            // 목표지점과 현재 위치의 거리 계산
-            distance = Vector3.Distance(movePosition.position, transform.position);
-            animator.SetFloat("speed", navMeshAgent.velocity.magnitude);
-            if (navMeshAgent.isStopped == true)
-            {
-                // 멈춰있을 때 플레이어를 바라봄
-                Vector3 lookPos = player.transform.position;
-                lookPos.y = transform.position.y;
-                transform.LookAt(lookPos);
-
-                if (!hasAimed)
-                {
-
-                    hasAimed = true;
-
-                }
-            }
-
-            // 목표지점에 도착하지 않았으면 이동
-            if (distance > targetDistance)
-            {
-                navMeshAgent.isStopped = false;
-                Movement();
-                arrivedTimer = 0f; // 이동 중에는 타이머 초기화
-                animator.SetBool("Aiming", false);
-
-            }
-            else // 목표지점에 도착했을 때
-            {
-                navMeshAgent.isStopped = true;
-                animator.SetBool("Aiming", true);
-
-
-                arrivedTimer += Time.fixedDeltaTime;
-                if (arrivedTimer >= 2f) // 2초마다 실행
-                {
-                    Debug.Log("목표지점에 도착한지 2초 경과");
-                    arrivedTimer = 0f;
-
-                    // 풀에서 비활성화된 총알 찾기
-                    GameObject bullet = null;
-                    foreach (var b in bulletPool)
-                    {
-                        if (!b.activeInHierarchy)
-                        {
-                            bullet = b;
-                            break;
-                        }
-                    }
-                    // 비활성화된 총알이 없으면 새로 생성해서 풀에 추가
-                    if (bullet == null)
-                    {
-                        bullet = Instantiate(bulletPrefab);
-                        bulletPool.Add(bullet);
-                    }
-
-                    // 총알 위치/회전 세팅 및 활성화
-                    bullet.transform.position = firePoint.position;
-                    bullet.transform.rotation = firePoint.rotation;
-                    bullet.SetActive(true);
-
-                    // 총알 발사(Bullet 스크립트의 Fire 호출)
-                    EnemyBullet bulletScript = bullet.GetComponent<EnemyBullet>();
-                    if (bulletScript != null)
-                    {
-                        bulletScript.Fire(firePoint.forward, bulletForce);
-                    }
-                }
-            }
-        }
-
-
-        
-        void Movement()
-        {
-            navMeshAgent.SetDestination(movePosition.position);
-        }
-
-        // 좀비 초기화 (속도, 가속도 설정 및 등장 시작)
-        public void Initialize(float speed, float timeToSpeed)
-        {
-            //maxSpeed = speed;
-            //timeToMaxSpeed = timeToSpeed;
-
-            // 비명을 지를 확률 결정
-            willScream = UnityEngine.Random.value <= screamChance;
-            hasScreamed = false;
-            isAttacking = false;
-
-        }
-        
-
-
-
-
-        #region Death & Damage
-
-        // 외부에서 호출: 좀비 사망 처리
-        public void Die()
         {
             if (isDead) return;
 
+            switch (currentState)
+            {
+                case EnemyState.Move:
+                    UpdateMove();
+                    break;
+                case EnemyState.AimPrepare:
+                    UpdateAimPrepare();
+                    break;
+                case EnemyState.AimLaser:
+                    UpdateAimLaser();
+                    break;
+                case EnemyState.Shoot:
+                    UpdateShoot();
+                    break;
+            }
+        }
+
+        // -------------------------------
+        // 상태별 함수
+        // -------------------------------
+
+        /// <summary>
+        /// 1. 목표지점까지 이동 (도달하면 AimPrepare로 전환)
+        /// </summary>
+        void UpdateMove()
+        {
+            distance = Vector3.Distance(movePosition.position, transform.position);
+            animator.SetFloat("speed", navMeshAgent.velocity.magnitude);
+
+            if (distance > targetDistance)
+            {
+                navMeshAgent.isStopped = false;
+                navMeshAgent.SetDestination(movePosition.position);
+                arrivedTimer = 0f;
+                animator.SetBool("Aiming", false);
+            }
+            else
+            {
+                // 도착 순간!
+                navMeshAgent.isStopped = true;
+                animator.SetBool("Aiming", true);
+
+                animator.SetFloat("speed", 0f); // ← 이 한줄 추가! (Idle 트리거)
+
+                // 정지 후 1초 준비
+                stateTimer = 0f;
+                currentState = EnemyState.AimPrepare;
+            }
+        }
+
+        /// <summary>
+        /// 2. 도착 후 1초 동안 조준 준비(플레이어 바라보기)
+        /// </summary>
+        void UpdateAimPrepare()
+        {
+            animator.SetBool("Aiming", true);
+            LookAtPlayer();
+            stateTimer += Time.fixedDeltaTime;
+            if (stateTimer >= 1f)
+            {
+                // 1초 후, 조준 방향 고정 & 레이저 표시
+                aimDirection = (player.transform.position - firePoint.position).normalized;
+                ShowAimLaser(aimDirection, true);
+                stateTimer = 0f;
+                currentState = EnemyState.AimLaser;
+            }
+        }
+
+        /// <summary>
+        /// 3. 1초간 레이저 표시(조준 고정), 이후 사격
+        /// </summary>
+        void UpdateAimLaser()
+        {
+            animator.SetBool("Aiming", true);
+            ShowAimLaser(aimDirection, true);
+            stateTimer += Time.fixedDeltaTime;
+            if (stateTimer >= 1f)
+            {
+                ShowAimLaser(aimDirection, false);
+                FireAtDirection(aimDirection);
+                stateTimer = 0f;
+                currentState = EnemyState.Shoot;
+            }
+        }
+
+        /// <summary>
+        /// 4. 사격 후 0.5초 대기, 이후 다시 이동 (Move)
+        /// </summary>
+        void UpdateShoot()
+        {
+            animator.SetBool("Aiming", false);
+            stateTimer += Time.fixedDeltaTime;
+            if (stateTimer >= 0.5f)
+            {
+                navMeshAgent.isStopped = false;
+                currentState = EnemyState.Move;
+            }
+        }
+
+        // -------------------------------
+        // 유틸 함수
+        // -------------------------------
+
+        /// <summary>
+        /// 플레이어 바라보기 (Y축 고정)
+        /// </summary>
+        void LookAtPlayer()
+        {
+            Vector3 lookPos = player.transform.position;
+            lookPos.y = transform.position.y;
+            transform.LookAt(lookPos);
+        }
+
+        /// <summary>
+        /// 조준 레이저 on/off 및 위치 설정
+        /// </summary>
+        void ShowAimLaser(Vector3 dir, bool show)
+        {
+            float playerDist = Vector3.Distance(firePoint.position, player.transform.position);
+            float offset = 0.3f;
+            float laserDist = Mathf.Max(0.1f, playerDist - offset);
+
+            if (show)
+            {
+                if (activeLaserTube == null)
+                    activeLaserTube = Instantiate(laserTubePrefab);
+
+                activeLaserTube.SetActive(true);
+
+                // 위치: firePoint에서 dir 방향으로 laserDist*0.5 만큼 이동 (Cylinder 중심)
+                activeLaserTube.transform.position = firePoint.position + dir * (laserDist * 0.5f);
+
+                // 이 부분이 핵심! → Cylinder의 Y축(위)을 dir로!
+                activeLaserTube.transform.rotation = Quaternion.FromToRotation(Vector3.up, dir);
+
+                // 스케일: Y축(길이/2)
+                activeLaserTube.transform.localScale = new Vector3(
+                    0.04f,            // X축(굵기)
+                    laserDist * 0.5f, // Y축(길이의 절반, Cylinder는 중앙 pivot)
+                    0.04f             // Z축(굵기)
+                );
+            }
+            else
+            {
+                if (activeLaserTube != null)
+                    activeLaserTube.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// 사격(총알 풀에서 발사)
+        /// </summary>
+        void FireAtDirection(Vector3 dir)
+        {
+            // 풀에서 비활성화 총알 찾기
+            GameObject bullet = null;
+            foreach (var b in bulletPool)
+            {
+                if (!b.activeInHierarchy)
+                {
+                    bullet = b;
+                    break;
+                }
+            }
+            if (bullet == null)
+            {
+                bullet = Instantiate(bulletPrefab);
+                bulletPool.Add(bullet);
+            }
+
+            bullet.transform.position = firePoint.position;
+            bullet.transform.rotation = Quaternion.LookRotation(dir);
+            bullet.SetActive(true);
+
+            EnemyBullet bulletScript = bullet.GetComponent<EnemyBullet>();
+            if (bulletScript != null)
+                bulletScript.Fire(dir, bulletForce);
+        }
+
+        // -------------------------------
+        // 데미지/사망 처리 (기존과 동일)
+        // -------------------------------
+        #region Death & Damage
+
+        /// <summary>
+        /// 사망 처리(애니메이션/이펙트 후 삭제)
+        /// </summary>
+        public void Die()
+        {
+            if (isDead) return;
             isDead = true;
 
-        // 죽음 애니메이션 실행
-        if (animator != null)
-        {
-            animator.SetTrigger("Die");
+            if (animator != null)
+                animator.SetTrigger("Die");
+            Destroy(gameObject, 5f);
         }
 
-        // 이펙트 생성
-        if (deathEffect != null)
-        {
-            Instantiate(deathEffect, transform.position, Quaternion.identity);
-        }
-
-        // 일정 시간 후 삭제 (애니메이션용 딜레이)
-        Destroy(gameObject, 5f);
-        }
-
-
-
-        // 데미지를 받았을 때 반응
+        /// <summary>
+        /// 피격 시 리액션/데미지 텍스트/플래시
+        /// </summary>
         private void OnEnemyTakeDamage(float damage)
         {
             if (isDead) return;
 
-            // 데미지 숫자 생성
             Instantiate(damageText, damageTextSpawn.position, Quaternion.identity, damageTextSpawn)
                 .SetText(damage.ToString("f1"));
-
-            // 일정 확률로 피격 리액션 재생
             if (UnityEngine.Random.value <= hitAnimationChance)
-                animator.SetTrigger(Hit);
-
+                animator.SetTrigger("Hit");
             FlashHitColor(0.1f);
-
         }
 
+        /// <summary>
+        /// 피격 시 색상 플래시
+        /// </summary>
         public void FlashHitColor(float duration = 0.2f)
         {
             if (bodyRenderer == null) return;
-
-            // 기존 코루틴 있으면 중지
             if (hitFlashRoutine != null)
                 StopCoroutine(hitFlashRoutine);
-
             hitFlashRoutine = StartCoroutine(HitFlashRoutine(duration));
         }
 
         private IEnumerator HitFlashRoutine(float duration)
         {
-            // 1. 머티리얼 원본 저장(복사본)
             if (hitFlashMaterial == null)
-                hitFlashMaterial = bodyRenderer.material; // material은 인스턴스 복제본!
-
-            // 2. 빨갛게
+                hitFlashMaterial = bodyRenderer.material;
             hitFlashMaterial.color = new Color(2f, 0f, 0f);
-
             yield return new WaitForSeconds(duration);
-
-            // 3. 원래 색상으로(보통은 원래 색상 저장해두는 게 안전)
             hitFlashMaterial.color = Color.white;
         }
 
-
-        // 디졸브(녹아내림) 후 삭제
         public void FadeAndDestroy()
         {
             StopAllCoroutines();
-            //StartCoroutine(AnimateAndDestroy());
         }
 
-
         #endregion
-
-        #region Debug
 
 #if UNITY_EDITOR
-        // 에디터에서 공격 범위 시각화
-        //private void OnDrawGizmosSelected()
-        //{
-        //    Gizmos.color = Color.red;
-        //    Gizmos.DrawWireSphere(transform.position, attackRange);
-        //}
+        //private void OnDrawGizmosSelected() { ... }
 #endif
-
-        #endregion
     }
 
-
-
-    // 좀비 인터페이스 (사망 기능만 정의됨)
-    public interface IEnemy
-    {
-        void Die();
-    }
-
-
+    /// <summary>
+    /// IEnemy 인터페이스 (사망 기능만)
+    /// </summary>
+    public interface IEnemy { void Die(); }
 }

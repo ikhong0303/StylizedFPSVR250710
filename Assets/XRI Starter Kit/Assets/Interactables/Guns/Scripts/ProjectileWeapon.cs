@@ -10,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit.Inputs.Haptics;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using static Unity.Mathematics.math; // 수학 유틸리티 함수(remap 등) 사용
+using TMPro;
 
 namespace MikeNspired.XRIStarterKit
 {
@@ -25,10 +26,15 @@ namespace MikeNspired.XRIStarterKit
         [SerializeField] private Transform cylinderTransform;      // 실린더(회전용 부모)
         [SerializeField] private List<GameObject> bullets;         // 실린더 안에 보이는 총알 오브젝트(6개 등)
 
+
         [Header("설정")]
         [SerializeField] private float bulletSpeed = 150f;         // 총알 속도
         [SerializeField] private float cylinderAngle = 60f;        // 실린더 회전 각도
         [SerializeField] private float cylinderRotateDuration = 0.2f;   // ★ 부드러운 회전 지속시간
+        [SerializeField] private TextMeshProUGUI ammoTextUI;       // UI용 TMP
+
+        public Transform aimPointer;     // 조준점 오브젝트(스피어, 플랫 스프라이트 등)
+        public float aimMaxDistance = 100f; // 최대 표시 거리
 
         public float recoilAmount = -0.03f;                        // 반동 이동 거리
         public float recoilRotation = 1;                           // 반동 회전
@@ -66,6 +72,8 @@ namespace MikeNspired.XRIStarterKit
             interactable.activated.AddListener(_ => FireGun());
             interactable.selectEntered.AddListener(SetupRecoilVariables);
             interactable.selectExited.AddListener(DestroyRecoilTracker);
+            UpdateAmmoTextUI();
+
         }
 
         private void FixedUpdate()
@@ -82,6 +90,16 @@ namespace MikeNspired.XRIStarterKit
                     lastReloadTime = Time.time;
                 }
             }
+
+            RaycastHit hit;
+            Vector3 targetPos;
+            if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, aimMaxDistance))
+                targetPos = hit.point;
+            else
+                targetPos = firePoint.position + firePoint.forward * aimMaxDistance;
+
+            aimPointer.position = targetPos;
+
         }
 
         public void FireGun()
@@ -143,6 +161,8 @@ namespace MikeNspired.XRIStarterKit
             // 반동
             //StopAllCoroutines();
             StartRecoil();
+            UpdateAmmoTextUI();
+            
         }
 
         // ★ 실린더(총알 그룹) 부드러운 회전 코루틴
@@ -176,7 +196,19 @@ namespace MikeNspired.XRIStarterKit
             if (cylinderTransform)
                 cylinderTransform.localRotation = Quaternion.identity;
             currentBulletIndex = 0;
+            UpdateAmmoTextUI();
         }
+
+        private void UpdateAmmoTextUI()
+        {
+            if (ammoTextUI != null)
+            {
+                int remaining = bullets.Count - currentBulletIndex;
+                ammoTextUI.text = remaining.ToString();
+            }
+        }
+
+
 
         // ==== 아래는 반동 코드(원본 유지) ====
         private void SetupRecoilVariables(SelectEnterEventArgs args)

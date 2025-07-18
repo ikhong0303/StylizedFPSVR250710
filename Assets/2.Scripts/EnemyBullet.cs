@@ -22,7 +22,7 @@ using System.Collections;
             }
 
             // 일정 시간 후 총알을 비활성화하는 코루틴 실행
-            StartCoroutine(DisableAfterSeconds(2f));
+            StartCoroutine(DisableAfterSeconds(1f));
         }
 
         /// <summary>
@@ -43,6 +43,9 @@ using System.Collections;
             if (health != null)
                 health.TakeDamage(10f);
         }
+        // ★ 충돌하면 즉시 비활성화 (벽, 바닥, 플레이어 등)
+        gameObject.SetActive(false);
     }
+
 
 }
