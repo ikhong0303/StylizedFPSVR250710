@@ -173,7 +173,8 @@ namespace MikeNspired.XRIStarterKit
         /// </summary>
         void UpdateShoot()
         {
-            animator.SetBool("Aiming", false);
+            animator.SetBool("Aiming", true); // ✅ 계속 조준 유지!
+
             stateTimer += Time.fixedDeltaTime;
             if (stateTimer >= 0.5f)
             {

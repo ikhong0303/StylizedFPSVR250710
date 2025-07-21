@@ -2168,8 +2168,12 @@ MonoBehaviour:
   movePosition: {fileID: 0}
   bulletPrefab: {fileID: 8627982499834681759, guid: 226681831d3361f4d88b9b701a121dba, type: 3}
   firePoint: {fileID: 1416142248109567349}
-  bulletForce: 500
-  deathEffect: {fileID: 0}
+  bulletForce: 1500
+  laserTubePrefab: {fileID: 0}
+  aimLaser: {fileID: 0}
+  laserColor: {r: 1, g: 0, b: 0, a: 1}
+  laserWidth: 0.05
+  laserLength: 30
 --- !u!95 &1030186265517646447
 Animator:
   serializedVersion: 7
@@ -2204,7 +2208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da2853eae5655464db1654f9ef12c8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 20
   currentHealth: 0
   damageCooldown: 0.1
 --- !u!114 &6062988072176756342
