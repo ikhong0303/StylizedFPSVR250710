@@ -27,13 +27,6 @@ namespace MikeNspired.XRIStarterKit
             lastDamageTime = -damageCooldown;     // 시작하자마자 바로 피격 가능하게 설정
         }
 
-        /// <summary>
-        /// 디버깅용 함수. 임의로 5 데미지를 입힘.
-        /// </summary>
-        public void TestDamage()
-        {
-            TakeDamage(5, gameObject);
-        }
 
         /// <summary>
         /// 외부에서 데미지를 가할 때 호출하는 함수.

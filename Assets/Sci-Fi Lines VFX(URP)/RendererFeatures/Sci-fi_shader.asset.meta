@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5d2a5b0359781b34cb9d791721fd1252
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 326256
+  packageName: Sci-Fi Lines VFX(URP)
+  packageVersion: 1.0
+  assetPath: Assets/Sci-Fi Lines VFX(URP)/RendererFeatures/Sci-fi_shader.asset
+  uploadId: 772006

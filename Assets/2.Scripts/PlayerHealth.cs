@@ -17,6 +17,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Awake()
     {
+        GameManager.Instance.player = this.gameObject;
         currentHealth = maxHealth;
         lastDamageTime = -damageCooldown;     // 시작하자마자 바로 피격 가능하게 설정
         //hitEffect = GetComponent<PlayerHitEffect>();

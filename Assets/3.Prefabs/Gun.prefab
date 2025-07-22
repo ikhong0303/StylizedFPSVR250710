@@ -740,92 +740,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2945559432194387109}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8222908502650825742
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5064449509871623238}
-  - component: {fileID: 4419020466502312651}
-  - component: {fileID: 794961633475614447}
-  m_Layer: 0
-  m_Name: Sphere
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5064449509871623238
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8222908502650825742}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1494, y: -0.0000000074506, z: 0}
-  m_LocalScale: {x: 0.068402804, y: 0.068402804, z: 0.068402804}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2945559432194387109}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &4419020466502312651
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8222908502650825742}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &794961633475614447
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8222908502650825742}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &8315677105451646001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1206,31 +1120,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.037
+      value: -1.479
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.027
+      value: 0.437
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.587
+      value: 3.760157
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.000080987804
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1238,7 +1152,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 359.991
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -1248,6 +1162,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: trigger
       objectReference: {fileID: 0}
+    - target: {fileID: -1439730007547781893, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6b331577c64c87940959876756074c92, type: 2}
     - target: {fileID: 919132149155446097, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       propertyPath: m_Name
       value: Gun
@@ -1299,9 +1217,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 695988100344832899}
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5064449509871623238}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdd145976ee81a345b4abefa6a90f79d, type: 3}
       insertIndex: -1
@@ -1367,7 +1282,7 @@ MonoBehaviour:
   cylinderAngle: 60
   cylinderRotateDuration: 0.1
   ammoTextUI: {fileID: 8949641416010696675}
-  aimPointer: {fileID: 5064449509871623238}
+  aimPointer: {fileID: 0}
   aimMaxDistance: 100
   recoilAmount: -0.07
   recoilRotation: 45.6
@@ -1401,7 +1316,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1897984865634723660}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 4294967295
   m_DistanceCalculationMode: 1
   m_SelectMode: 0
   m_FocusMode: 1
