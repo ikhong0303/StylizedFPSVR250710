@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5402593939988167321}
   - component: {fileID: 6805892928375831998}
-  - component: {fileID: 2568857828610405514}
   m_Layer: 0
   m_Name: CurvedLine
   m_TagString: Untagged
@@ -51,6 +50,9 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -135,27 +137,3 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &2568857828610405514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 582262769691199631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d882f4afdee0c0943820f0151b0d5e35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ToggleGizmos: 0
-  gizmoSphereRadius: 0.1
-  startPoint: {fileID: 0}
-  endPoint: {fileID: 0}
-  middlePoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  pointsPerSegment: 12
-  middlePointNumber: 0

@@ -7,8 +7,8 @@ public class PlayerHealthBar : MonoBehaviour
     public PlayerHealth playerHealth;
     public Image curveBar;
 
-    public float distance = 0.7f;
-    public float fixedY = 3f;
+    public float distance = 1f;
+    public float yourOffset = -1.5f; // 플레이어 머리 위로 올리는 높이
 
     // 색상 지정
     public Color fullHealthColor = Color.green;                  // 100% (녹색)
@@ -25,7 +25,7 @@ public class PlayerHealthBar : MonoBehaviour
         // 위치 보정
         Vector3 camPos = playerHead.position;
         Vector3 forward = playerHead.forward; forward.y = 0f; forward.Normalize();
-        Vector3 barPos = camPos + forward * distance; barPos.y = fixedY;
+        Vector3 barPos = camPos + forward * distance + Vector3.up * yourOffset;
         transform.position = barPos;
 
         transform.rotation = Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(90, 0, 0);

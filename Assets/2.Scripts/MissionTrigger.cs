@@ -6,10 +6,12 @@ public class MissionTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // 플레이어만 트리거 인식
+        if (other.CompareTag("Player"))
         {
             missionManager.NextMission();
-            // or missionManager.SetMission(원하는 인덱스);
+
+            // 트리거 오브젝트를 씬에서 완전히 제거 (최적화)
+            Destroy(gameObject);
         }
     }
 }
