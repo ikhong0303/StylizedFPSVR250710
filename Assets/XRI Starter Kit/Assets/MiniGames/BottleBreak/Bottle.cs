@@ -47,43 +47,39 @@ namespace MikeNspired.XRIStarterKit
         // 총알, 근접타격 등으로 피해를 받으면 이 함수가 호출됨
         public void TakeDamage(float damage, GameObject damager)
         {
-            // 1. 맞았다는 이벤트(데미지 값 포함) 알리기
             onHit.Invoke(damage);
+            GetComponent<AudioRandomize>()?.Play();
 
-            // 2. 랜덤 사운드 재생 (병 깨지는 소리)
-            GetComponent<AudioRandomize>().Play();
-
-            // 3. 파티클(물 튀김) 이펙트 실행 (부모에서 분리해서)
-            particleSystemSplash.transform.parent = null;
-            particleSystemSplash.gameObject.SetActive(true);
-            particleSystemSplash.Play();
-
-            // 4. 깨진 병 파편 표시, 액체와 원래 병은 꺼버림
-            SmashedObject.SetActive(true);   // 파편 on
-            Liquid.SetActive(false);         // 액체 off
-            Mesh.SetActive(false);           // 병 메쉬 off
-
-            // 5. 파편에 물리 충격 가하기 (카메라 기준으로 방향 계산)
-            Rigidbody[] rbs = SmashedObject.GetComponentsInChildren<Rigidbody>();
-            Transform camera = Camera.main.transform;
-            var position = transform.position - camera.position; // 병 → 카메라 방향
-
-            foreach (Rigidbody rb in rbs)
+            // 파티클
+            if (particleSystemSplash != null)
             {
-                // 파편에 폭발(튕겨나가는) 힘 적용
-                rb.AddExplosionForce(
-                    glassExplodeForce,
-                    SmashedObject.transform.position - position.normalized * 0.25f, // 폭발 중심: 카메라 기준 살짝 앞으로
-                    2.0f,      // 폭발 반경
-                    explodeUpwardModifier   // 위로 튀는 힘
-                );
+                particleSystemSplash.transform.parent = null;
+                particleSystemSplash.gameObject.SetActive(true);
+                particleSystemSplash.Play();
             }
 
-            // 6. 파편이 씬의 루트에 남게끔 부모 끊기
-            SmashedObject.transform.parent = null;
+            // 파편 활성화
+            if (SmashedObject != null)
+            {
+                SmashedObject.SetActive(true);
+                // 파편에 물리 충격
+                Rigidbody[] rbs = SmashedObject.GetComponentsInChildren<Rigidbody>();
+                Transform camera = Camera.main?.transform;
+                Vector3 position = (camera != null) ? transform.position - camera.position : Vector3.forward;
+                foreach (Rigidbody rb in rbs)
+                    rb.AddExplosionForce(glassExplodeForce, SmashedObject.transform.position - position.normalized * 0.25f, 2.0f, explodeUpwardModifier);
 
-            // 7. 병 본체(이 스크립트 붙은 오브젝트) 3초 뒤에 파괴
+                // 부모 끊기
+                SmashedObject.transform.parent = null;
+            }
+            // 액체/메쉬
+            if (Liquid != null)
+                Liquid.SetActive(false);
+            if (Mesh != null)
+                Mesh.SetActive(false);
+
             Destroy(gameObject, 3);
         }
+
     }
 }

@@ -85,6 +85,7 @@ namespace MikeNspired.XRIStarterKit
             else
                 // IImpactType이 없으면 기본적으로 metal 데칼 생성
                 SpawnDecal(collision, metalDecal, false);
+                SpawnDecal(collision, metalDecal, false);
         }
 
         // 데칼 프리팹을 충돌 지점에 생성하고, 필요시 부모를 설정

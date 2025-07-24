@@ -36,11 +36,6 @@ namespace MikeNspired.XRIStarterKit
             originalLocalPos = attachTransform.localPosition;
             originalLocalRot = attachTransform.localRotation;
 
-            // Create the dummy transform parented under the hand model
-            handModelAttach = new GameObject("HandModelAttach" + name).transform;
-            handModelAttach.SetParent(Hand.transform, false);
-            handModelAttach.localPosition = Vector3.zero;
-            handModelAttach.localRotation = Quaternion.identity;
         }
 
         private void OnGrab(SelectEnterEventArgs args)

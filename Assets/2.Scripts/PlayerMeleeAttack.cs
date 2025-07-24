@@ -1,6 +1,5 @@
 using MikeNspired.XRIStarterKit;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit; // XRBaseController로 진동
 
 public class PlayerMeleeAttack : MonoBehaviour
 {
@@ -11,12 +10,22 @@ public class PlayerMeleeAttack : MonoBehaviour
     public AudioClip hitSound;
     public GameObject hitEffectPrefab;
 
-    [Header("XR Haptic (진동)")]
-    public XRBaseController controller; // 내 손(왼/오른쪽) XRBaseController 연결
-    public float hapticAmplitude = 0.5f;
-    public float hapticDuration = 0.1f;
+    [Header("펀치 속도 설정")]
+    public float minAttackSpeed = 2.0f; // 이 속도 이상일 때만 데미지
+    private Vector3 lastPosition;
 
     private float lastAttackTime = -100f;
+
+    private void Start()
+    {
+        lastPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        // 위치를 항상 저장해둔다 (OnTriggerEnter용)
+        lastPosition = transform.position;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -28,20 +37,20 @@ public class PlayerMeleeAttack : MonoBehaviour
         var damageable = other.GetComponent<IDamageable>();
         if (damageable == null) return;
 
+        // 속도 체크 (직전 프레임과의 거리 변화)
+        float speed = (transform.position - lastPosition).magnitude / Time.deltaTime;
+        if (speed < minAttackSpeed) return;
+
         // 데미지 적용
         damageable.TakeDamage(attackDamage, gameObject);
         lastAttackTime = Time.time;
 
         // 효과음
-        if (hitSound && Camera.main) // AudioSource가 손에 없으면, 카메라에서 재생
+        if (hitSound && Camera.main)
             AudioSource.PlayClipAtPoint(hitSound, transform.position, 1f);
 
         // 이펙트(파티클 등)
         if (hitEffectPrefab)
             Instantiate(hitEffectPrefab, other.ClosestPointOnBounds(transform.position), Quaternion.identity);
-
-        // 진동
-        if (controller != null)
-            controller.SendHapticImpulse(hapticAmplitude, hapticDuration);
     }
 }

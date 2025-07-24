@@ -162,9 +162,21 @@ namespace MikeNspired.XRIStarterKit
                 return;
             }
 
-            float playerDist = Vector3.Distance(firePoint.position, player.transform.position);
+            float laserDist = 20f; // 레이저 최대 거리 (플레이어와의 거리 대신 임의값)
+            RaycastHit hit;
+            if (Physics.Raycast(firePoint.position, dir, out hit, 20f))
+            {
+                laserDist = hit.distance;
+            }
+            else
+            {
+                // 혹시 플레이어가 20m 넘게 떨어진 곳에 있으면
+                float playerDist = Vector3.Distance(firePoint.position, player.transform.position);
+                laserDist = Mathf.Min(playerDist, 20f);
+            }
+
             float offset = 0.3f;
-            float laserDist = Mathf.Max(0.1f, playerDist - offset);
+            laserDist = Mathf.Max(0.1f, laserDist - offset);
 
             if (show)
             {
