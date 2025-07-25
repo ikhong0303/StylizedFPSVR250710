@@ -5,105 +5,45 @@ ModelImporter:
   internalIDToNameTable: []
   externalObjects:
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: bossbody_body_AlbedoTransparency
-    second: {fileID: 2800000, guid: 1ae5791f176cb844abb6e31eb25b4857, type: 3}
+      name: body_BaseColor_1001
+    second: {fileID: 2100000, guid: cefe838abd45d0547a98e4f658e1c6de, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: bossbody_body_Normal
-    second: {fileID: 2800000, guid: f14f1261c4d02f14fbe7d1abf48a25e9, type: 3}
+      name: eye_BaseColor_1001
+    second: {fileID: 2100000, guid: 0dad97d651dcbd74da08a913c50a8955, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: eye_BaseColor.1001
-    second: {fileID: 2800000, guid: 6a1989e49c9254e4aa765453b2eda4e7, type: 3}
+      name: hair_BaseColor
+    second: {fileID: 2100000, guid: bad3936607283d9448b33015dd4ff4c6, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: eye_Emission.1001
-    second: {fileID: 2800000, guid: 579bfd3f3774f5f4eb3f591383f618e4, type: 3}
+      name: hakuma_BaseColor_1001
+    second: {fileID: 2100000, guid: ea1b8a28486e7e141b4c21c3bb14cf29, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: eye_Normal.1001
-    second: {fileID: 2800000, guid: 4b44a056e6e52b1409e227f0bd22a1ec, type: 3}
+      name: socks_002
+    second: {fileID: 2100000, guid: 69e1149dc8ed29442aa45fb4039fda74, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: hair.001_BaseColor
-    second: {fileID: 2800000, guid: 59403c2de5b3f84409fde257089c8a41, type: 3}
+      name: sword_BaseColor_1001
+    second: {fileID: 2100000, guid: 7cbb3bd49bd44344199da18e1a6dc4d7, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: hair.001_Emission
-    second: {fileID: 2800000, guid: b651f6ae6dcaef443bb578f4edbf4f40, type: 3}
+      name: tooth_BaseColor_1001
+    second: {fileID: 2100000, guid: 82da684706d931d429c44be462cafd06, type: 2}
   - first:
-      type: UnityEngine:Texture2D
+      type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: hair.001_Normal
-    second: {fileID: 2800000, guid: 60a9d925f6257f84dab61a302a25cf01, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: hakuma_BaseColor.1001
-    second: {fileID: 2800000, guid: cd6298fe00fd555498ef30a8c62ccf05, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: hakuma_Emission.1001
-    second: {fileID: 2800000, guid: 6133142f9f392da438c487b4884756f0, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: hakuma_Normal.1001
-    second: {fileID: 2800000, guid: 52c8ec84fb06cdb4a9b067098570c8e2, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: sword_BaseColor.1001
-    second: {fileID: 2800000, guid: 2155c2d78e8c6ab45aa5085313b81f48, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: sword_Emission.1001
-    second: {fileID: 2800000, guid: bd0e677fd62ea1843b2cff101aa03946, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: sword_Normal.1001
-    second: {fileID: 2800000, guid: a0d6f960b36b331468ccbadd56cd54eb, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: tooth_BaseColor.1001
-    second: {fileID: 2800000, guid: 9cb39b942a48cdd4eb013c6356fbac00, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: tooth_Emission.1001
-    second: {fileID: 2800000, guid: 623d81540b81a6141914efd5daa803be, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: tooth_Normal.1001
-    second: {fileID: 2800000, guid: 067d06aae07961442862ec92373018d0, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: zori_zori._BaseColor
-    second: {fileID: 2800000, guid: ecf65aaf9653d274eac5285f03fff35c, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: zori_zori._Emissive
-    second: {fileID: 2800000, guid: 129f00062a116f54399194240da49699, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: zori_zori._Normal
-    second: {fileID: 2800000, guid: bad1ec9f61f87b44da1800b3d7c46a29, type: 3}
+      name: zori_zori__BaseColor
+    second: {fileID: 2100000, guid: db7fd0b11dbb60f428bba9575c85735e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

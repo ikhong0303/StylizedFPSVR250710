@@ -6,10 +6,10 @@ public class PlayerHealthBar : MonoBehaviour
     public Transform playerHead;
     public PlayerHealth playerHealth;
     public Image curveBar;
+    public Transform playerOrigin; // 플레이어 발 위치 (XR Origin)
 
     public float distance = 1f;
-    public float yourOffset = -1.5f; // 플레이어 머리 위로 올리는 높이
-
+    public float groundOffsetY = 1.6f; // 지면에서 health bar가 뜨는 높이
     // 색상 지정
     public Color fullHealthColor = Color.green;                  // 100% (녹색)
     public Color midHealthColor = Color.yellow;                  // 50% (노란색)
@@ -22,12 +22,25 @@ public class PlayerHealthBar : MonoBehaviour
 
     void LateUpdate()
     {
-        // 위치 보정
+
         Vector3 camPos = playerHead.position;
         Vector3 forward = playerHead.forward; forward.y = 0f; forward.Normalize();
-        Vector3 barPos = camPos + forward * distance + Vector3.up * yourOffset;
-        transform.position = barPos;
 
+        // --- 발 위치에서 아래로 쏨 ---
+        Vector3 rayOrigin = playerOrigin ? playerOrigin.position : camPos; // Origin이 없으면 카메라라도 사용
+
+        float yOnGround = rayOrigin.y;
+        RaycastHit hit;
+        if (Physics.Raycast(rayOrigin, Vector3.down, out hit, 10f, LayerMask.GetMask("Default")))
+        {
+            yOnGround = hit.point.y;
+        }
+
+        // **지면 기준으로 띄우기**
+        Vector3 barPos = camPos + forward * distance;
+        barPos.y = yOnGround + groundOffsetY; // ★ 지면에서 고정 높이만큼 띄우기
+
+        transform.position = barPos;
         transform.rotation = Quaternion.LookRotation(forward, Vector3.up) * Quaternion.Euler(90, 0, 0);
 
         // 체력 연동 + 색상 그라데이션 + 깜빡임
