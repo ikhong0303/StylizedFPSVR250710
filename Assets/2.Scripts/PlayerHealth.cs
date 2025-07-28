@@ -15,7 +15,7 @@ public class PlayerHealth : MonoBehaviour
 
     private bool isDead = false;
 
-    private void Awake()
+    private void Start()
     {
         GameManager.Instance.player = this.gameObject;
         currentHealth = maxHealth;

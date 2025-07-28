@@ -3,24 +3,21 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// 미션 패널(팝업)을 VR 플레이어의 손목 위치에 따라다니게 하고,
-/// 씬 전환 후에도 자동으로 손목에 바인딩되도록 한다.
-/// (팝업 표시/숨기기, 위치 오프셋, 카메라 빌보드, 자동 손목 연결 지원)
+/// 씬 전환 등으로 XR Origin이 바뀌어도 자동으로 손목 트랜스폼을 찾아 연결한다.
+/// (팝업 표시/숨기기, 위치 오프셋, 카메라 빌보드 지원)
 /// </summary>
 public class MissionPopupFollower : MonoBehaviour
 {
     [Header("필수 연결")]
-    [Tooltip("플레이어의 왼손 손목 Transform. Inspector에서 drag하거나, 자동 할당 사용")]
-    public Transform leftWrist;
-
-    [Tooltip("미션 패널 루트 오브젝트")]
+    [Tooltip("미션 패널 루트 오브젝트 (Inspector에서 drag)")]
     public GameObject missionPanel;
 
     [Tooltip("팝업 토글 입력(Input System)")]
     public InputActionReference showMissionInput;
 
     [Header("자동 바인딩 옵션")]
-    [Tooltip("손목 트랜스폼을 찾기 위한 경로 (Player 하위)")]
-    public string leftWristPath = "HandL/PopupAttachPoint";
+    [Tooltip("손목 트랜스폼을 찾기 위한 경로 (Player 하위, 예: 'Origin/XROrigin/CameraOffset/LeftController')")]
+    public string leftWristPath = "Camera Offset/Left Controller"; // 프로젝트 구조에 맞게 수정
 
     [Header("위치/회전 옵션")]
     [Tooltip("손목에서의 위치 오프셋")]
@@ -29,6 +26,7 @@ public class MissionPopupFollower : MonoBehaviour
     [Tooltip("팝업이 항상 카메라를 바라보게 할지")]
     public bool lookAtCamera = true;
 
+    private Transform leftWrist;
     private bool isVisible = false;
 
     void OnEnable()
@@ -52,11 +50,15 @@ public class MissionPopupFollower : MonoBehaviour
     void TryAutoAssignWrist()
     {
         if (leftWrist != null) return;
+
         if (GameManager.Instance != null && GameManager.Instance.player != null)
         {
+            // Player 하위에서 leftWristPath 경로로 Transform 찾기
             Transform wrist = GameManager.Instance.player.transform.Find(leftWristPath);
             if (wrist != null)
                 leftWrist = wrist;
+            else
+                Debug.LogWarning($"MissionPopupFollower: '{leftWristPath}' 경로의 손목 Transform을 찾을 수 없습니다.");
         }
     }
 
@@ -86,7 +88,6 @@ public class MissionPopupFollower : MonoBehaviour
     /// <summary>
     /// 팝업 토글 입력 시 호출되는 함수
     /// </summary>
-    /// <param name="ctx"></param>
     void OnShowMissionInput(InputAction.CallbackContext ctx)
     {
         ToggleMissionPanel();

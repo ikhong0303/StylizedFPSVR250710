@@ -951,10 +951,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7824213126be95a47835a5b61905fc3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftWrist: {fileID: 0}
   missionPanel: {fileID: 5884260307225742652}
   showMissionInput: {fileID: 7549162699250721271, guid: c348712bda248c246b8c49b3db54643f, type: 3}
-  leftWristPath: HandL/PopupAttachPoint
+  leftWristPath: Camera Offset/Left Controller
   offset: {x: 0, y: 0, z: 0.1}
   lookAtCamera: 1
 --- !u!114 &3751672460701987153
