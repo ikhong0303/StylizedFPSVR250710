@@ -7,9 +7,8 @@ public class PlayerHealthBar : MonoBehaviour
     public PlayerHealth playerHealth;
     public Image curveBar;
 
-    public Vector3 localOffset = new Vector3(0, 1.0f, 0.2f); // 허리~가슴 높이, 앞으로 약간
+    public Vector3 localOffset = new Vector3(0, 1.0f, 0.2f);
 
-    // 색상/깜빡임 세팅은 동일
     public Color fullHealthColor = Color.green;
     public Color midHealthColor = Color.yellow;
     public Color lowHealthColor = new Color(1f, 0.25f, 0.1f);
@@ -20,20 +19,27 @@ public class PlayerHealthBar : MonoBehaviour
 
     void LateUpdate()
     {
+        // 1. 위치 업데이트
         if (playerBody != null)
-        {
-            // Origin을 기준으로 오프셋 적용
             transform.position = playerBody.TransformPoint(localOffset);
 
-            // 항상 카메라(머리)를 바라보게
-            if (Camera.main != null)
-            {
-                Vector3 dir = (transform.position - Camera.main.transform.position).normalized;
-                transform.rotation = Quaternion.LookRotation(dir, Vector3.up) * Quaternion.Euler(90, 0, 0);
-            }
+        // 2. 카메라의 Yaw만 따라가서 헬스바가 튀지 않게 Billboard 방식으로 회전
+        if (Camera.main != null)
+        {
+            // 카메라의 forward에서 y축을 0으로 (수평 방향만)
+            Vector3 camForward = Camera.main.transform.forward;
+            camForward.y = 0;
+            if (camForward.sqrMagnitude < 0.001f)
+                camForward = Vector3.forward; // fallback
+
+            Quaternion lookRot = Quaternion.LookRotation(camForward, Vector3.up);
+            transform.rotation = lookRot;
+
+            // 이미지가 눕거나 뒤집혔으면 아래처럼 회전 추가
+            transform.Rotate(90, 0, -180); 
         }
 
-        // (아래 부분은 동일)
+        // 3. 체력 바 UI 갱신
         if (playerHealth != null && curveBar != null)
         {
             float current = playerHealth.GetCurrentHealth();
