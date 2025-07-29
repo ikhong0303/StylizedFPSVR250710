@@ -57,12 +57,14 @@ namespace MikeNspired.XRIStarterKit
 
             finalPosition = RotatePointAroundPivot(finalPosition, Vector3.zero, finalRotation.eulerAngles);
 
-            handModelAttach.localPosition = finalPosition;
-            handModelAttach.localRotation = finalRotation;
+            if (handModelAttach != null)
+            {
+                handModelAttach.localPosition = finalPosition;
+                handModelAttach.localRotation = finalRotation;
 
-            // We read out its *world* position/rotation, and apply that to the XR attach transform:
-            attachTransform.position = handModelAttach.position;
-            attachTransform.rotation = handModelAttach.rotation;
+                attachTransform.position = handModelAttach.position;
+                attachTransform.rotation = handModelAttach.rotation;
+            }
         }
 
         private void FindHandPoser(SelectEnterEventArgs args)
