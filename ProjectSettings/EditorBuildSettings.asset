@@ -9,10 +9,13 @@ EditorBuildSettings:
     path: Assets/1.Scenes/SampleScene.unity
     guid: 55daccc09a3b69647bbab145b54a3ab3
   - enabled: 1
-    path: Assets/1.Scenes/1.LAB.unity
-    guid: 02593f1e371338c4eb8b39455ec3ed60
+    path: Assets/1.Scenes/1.Lab.unity
+    guid: 5ae2ada35289b494ba8eb2396bb51bf7
   - enabled: 1
     path: Assets/1.Scenes/2.Street.unity
+    guid: 1be199b3b9ccad84f989cb6ddf219c62
+  - enabled: 1
+    path: Assets/1.Scenes/3.garden.unity
     guid: 40b390ce72cb74348bd36e9bb5e25128
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260, type: 2}
