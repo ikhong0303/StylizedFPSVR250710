@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class MissionLineRenderer : MonoBehaviour
 {
@@ -7,20 +8,36 @@ public class MissionLineRenderer : MonoBehaviour
     public List<MissionStep> missionSteps = new List<MissionStep>();
     public LineRenderer lineRenderer;
 
-    [Header("라인 설정")]
-    public float lineWidth = 0.07f;  // Inspector에서 조절
+    [Tooltip("팝업 토글 입력(Input System)")]
+    public InputActionReference showMissionInput;
+    public GameObject Line; // 라인 전체(부모) 오브젝트
 
+    [Header("라인 설정")]
+    public float lineWidth = 0.07f;
     public float waypointReachDistance = 1.5f;
     public float missionTargetReachDistance = 2.0f;
 
     int currentMissionIndex = 0;
     MissionStep currentStep => missionSteps[currentMissionIndex];
 
+    void OnEnable()
+    {
+        showMissionInput.action.performed += OnShowMissionInput;
+    }
+
+    void OnDisable()
+    {
+        showMissionInput.action.performed -= OnShowMissionInput;
+    }
+
     void FixedUpdate()
     {
+        // 미션이나 플레이어 없으면 라인 비활성화
         if (player == null || missionSteps.Count == 0)
         {
-            lineRenderer.enabled = false; return;
+            if (Line.activeSelf)
+                Line.SetActive(false);
+            return;
         }
 
         // --- 웨이포인트 자동 제거 ---
@@ -38,19 +55,22 @@ public class MissionLineRenderer : MonoBehaviour
             {
                 if (currentMissionIndex < missionSteps.Count - 1)
                 {
-                    // 다음 미션 단계로 이동
                     currentMissionIndex++;
                 }
                 else
                 {
-                    // 모든 미션 완료!
-                    lineRenderer.enabled = false;
-                    // 필요시 추가 정리
-                    // Destroy(this.gameObject);
+                    // 모든 미션 완료: 라인 숨기기
+                    if (Line.activeSelf)
+                        Line.SetActive(false);
+                    // 필요시 Destroy(this.gameObject);
                     return;
                 }
             }
         }
+
+        // 미션 중이면 라인 항상 표시
+        if (!Line.activeSelf)
+            Line.SetActive(true);
 
         DrawLine();
     }
@@ -58,10 +78,8 @@ public class MissionLineRenderer : MonoBehaviour
     void DrawLine()
     {
         int count = 2 + currentStep.waypoints.Count;
-        lineRenderer.enabled = true;
         lineRenderer.positionCount = count;
 
-        // 폭 적용!
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
 
@@ -70,9 +88,19 @@ public class MissionLineRenderer : MonoBehaviour
             lineRenderer.SetPosition(i + 1, currentStep.waypoints[i].position);
         lineRenderer.SetPosition(count - 1, currentStep.missionTarget.position);
     }
+
+    void OnShowMissionInput(InputAction.CallbackContext ctx)
+    {
+        ToggleLine();
+    }
+
+    // 미션 라인 전체 표시/숨기기 토글 (GameObject의 SetActive만 사용)
+    void ToggleLine()
+    {
+        Line.SetActive(!Line.activeSelf);
+    }
 }
 
-// --- 아래는 Inspector에서 보이게 하기 위함 ---
 [System.Serializable]
 public class MissionStep
 {
