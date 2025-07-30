@@ -12,7 +12,8 @@ using UnityEngine.UI;
 public class PlayerHealthBar : MonoBehaviour
 {
     [Header("위치 지정")]
-    public Transform playerBody;    // XR Origin, 혹은 플레이어 본체(Inspector에서 직접 drag)
+    public Transform playerHead;    // XR Origin, 혹은 플레이어 본체(Inspector에서 직접 drag)
+    public Transform playerBody;
     public Vector3 localOffset = new Vector3(0, 1.0f, 0.2f); // 플레이어 기준 헬스바 위치(조정 가능)
 
     [Header("체력 데이터")]
@@ -35,25 +36,20 @@ public class PlayerHealthBar : MonoBehaviour
 
     void LateUpdate()
     {
-        // 1. 헬스바 위치: 플레이어 기준 Offset 적용 (팔, 머리 위 등 원하는 곳에 맞춰 조정)
-        if (playerBody != null)
-            transform.position = playerBody.TransformPoint(localOffset);
+        if (playerHead == null || playerBody == null) return;
 
-        // 2. 헬스바 회전: 카메라 방향만 따라가게(수평 billboard)
-        if (Camera.main != null)
-        {
-            Vector3 camForward = Camera.main.transform.forward;
-            camForward.y = 0; // 수평 방향만 반영(roll, pitch 무시)
-            if (camForward.sqrMagnitude < 0.001f)
-                camForward = Vector3.forward; // 혹시 카메라가 완전히 위/아래를 본다면 fallback
+        // 1. 위치: 머리 offset 위치, Y는 body 기준
+        Vector3 pos = playerHead.TransformPoint(localOffset);
+        pos.y = playerBody.position.y + localOffset.y;
+        transform.position = pos;
 
-            Quaternion lookRot = Quaternion.LookRotation(camForward, Vector3.up);
-            transform.rotation = lookRot;
+        // 2. 회전: 머리(카메라)의 Yaw(좌우회전)만 사용
+        Vector3 euler = playerHead.rotation.eulerAngles;
+        Quaternion yawOnly = Quaternion.Euler(0, euler.y, 0);
 
-            // 이미지가 눕거나 뒤집힌다면 이 회전값을 조절
-            // (대부분의 경우 90, 0, -180 조합이 맞음, 직접 수정 가능!)
-            transform.Rotate(90, 0, -180);
-        }
+        transform.rotation = yawOnly;
+        // 추가 회전(이미지 눕는 현상 있으면)
+        transform.Rotate(90, 0, -180);
 
         // 3. 체력 바 이미지 fillAmount/색상 등 갱신
         if (playerHealth != null && leftBar != null && rightBar != null)

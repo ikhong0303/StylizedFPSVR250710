@@ -74,6 +74,9 @@ namespace MikeNspired.XRIStarterKit
             interactable.selectExited.AddListener(DestroyRecoilTracker);
             UpdateAmmoTextUI();
 
+            if (ammoTextUI != null)
+                ammoTextUI.enabled = false;
+
         }
 
         private void FixedUpdate()
@@ -215,12 +218,18 @@ namespace MikeNspired.XRIStarterKit
         {
             controller = args.interactorObject as XRBaseInteractor;
             StartCoroutine(SetupRecoil(interactable.attachEaseInTime));
+
+            if (ammoTextUI != null)
+                ammoTextUI.enabled = true;
         }
         private void DestroyRecoilTracker(SelectExitEventArgs args)
         {
             StopAllCoroutines();
             if (recoilTracker) Destroy(recoilTracker.gameObject);
             isRecoiling = false;
+
+            if (ammoTextUI != null)
+                ammoTextUI.enabled = false;
         }
         private System.Collections.IEnumerator SetupRecoil(float interactableAttachEaseInTime)
         {

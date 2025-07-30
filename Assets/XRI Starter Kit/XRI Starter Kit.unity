@@ -20650,23 +20650,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 1585432902}
   projectilePrefab: {fileID: 1277569234665110449, guid: 1713cf513d7a3354f8911a3a3216b50b, type: 3}
-  cartridgeEjection: {fileID: 1577590294}
   fireAudio: {fileID: 366369717}
-  outOfAmmoAudio: {fileID: 814035460}
+  cartridgeEjection: {fileID: 1577590294}
   bulletFlash: {fileID: 8368268949877903822, guid: 9192e08d2f3857b468cb7452ab4bbdb9, type: 3}
-  gunCocking: {fileID: 0}
-  magazineAttach: {fileID: 0}
+  cylinderTransform: {fileID: 0}
+  bullets: []
+  bulletSpeed: 150
+  cylinderAngle: 60
+  cylinderRotateDuration: 0.2
+  ammoTextUI: {fileID: 0}
+  aimPointer: {fileID: 0}
+  aimMaxDistance: 100
   recoilAmount: -0.75
   recoilRotation: 70
   recoilTime: 0.04
-  bulletsPerShot: 1
-  bulletSpreadAngle: 0
-  bulletSpeed: 150
-  infiniteAmmo: 1
   hapticDuration: 0.1
   hapticStrength: 0.7
-  fireSpeed: 0.15
-  automaticFiring: 1
+  reloadAngle: 60
+  reloadCooldown: 1
   BulletFiredEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -71945,11 +71946,11 @@ PrefabInstance:
       objectReference: {fileID: 6334681852911358590, guid: c4d486a38fe000346b95bdbffb892225, type: 3}
     - target: {fileID: 6022625271941186205, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.015670776
+      value: 0.002612114
       objectReference: {fileID: 0}
     - target: {fileID: 6022625271941186205, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.017181396
+      value: 0.010040283
       objectReference: {fileID: 0}
     - target: {fileID: 6197792195825371100, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_IsActive
@@ -71969,7 +71970,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8244909689269462660, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0073373467
+      value: 0.002612114
       objectReference: {fileID: 0}
     - target: {fileID: 8244909689269462660, guid: 31324bb751cdf8946ad9f5f04221b57f, type: 3}
       propertyPath: m_LocalPosition.z

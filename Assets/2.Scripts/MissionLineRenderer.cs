@@ -62,17 +62,17 @@ public class MissionLineRenderer : MonoBehaviour
                     // 모든 미션 완료: 라인 숨기기
                     if (Line.activeSelf)
                         Line.SetActive(false);
-                    // 필요시 Destroy(this.gameObject);
                     return;
                 }
             }
         }
 
-        // 미션 중이면 라인 항상 표시
-        if (!Line.activeSelf)
-            Line.SetActive(true);
+        // *** 라인 자동 활성화 코드 삭제! ***
+        // if (!Line.activeSelf)
+        //    Line.SetActive(true);
 
-        DrawLine();
+        if (Line.activeSelf)
+            DrawLine();
     }
 
     void DrawLine()

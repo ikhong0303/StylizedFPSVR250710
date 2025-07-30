@@ -65,11 +65,6 @@ public class MadamDialogueManager : MonoBehaviour
             audioSource.clip = linesAudio[currentLine];
             audioSource.Play();
         }
-        else
-        {
-            Debug.LogWarning("[MadamDialogueManager] 오디오 클립이 할당되지 않았습니다!");
-        }
-
         subtitleText.text = linesText[currentLine];
     }
 

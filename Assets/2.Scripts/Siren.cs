@@ -27,6 +27,8 @@ public class Siren : MonoBehaviour
     private bool rightFilled = false;
     private bool sirenStarted = false;
 
+    public bool BothHolstered => leftFilled && rightFilled;
+
     void OnEnable()
     {
         leftHolster.selectEntered.AddListener(OnLeftSocketFilled);
