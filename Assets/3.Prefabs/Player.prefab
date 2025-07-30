@@ -23177,7 +23177,6 @@ GameObject:
   - component: {fileID: 6386620415885109789}
   - component: {fileID: 708503039403115105}
   - component: {fileID: 7472874309358297982}
-  - component: {fileID: 4997780873904592569}
   - component: {fileID: 8537465515406789701}
   - component: {fileID: 523062852685816427}
   - component: {fileID: 469292377652522079}
@@ -23303,21 +23302,6 @@ MonoBehaviour:
     m_Duration: 0.1
     m_Frequency: 0
   m_AllowHoverHapticsWhileSelecting: 0
---- !u!114 &4997780873904592569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4337012433402719700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b941932411bed734388674f2dadf94c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  behaviour: {fileID: 708503039403115105}
-  inputAction: {fileID: -6131295136447488360, guid: c348712bda248c246b8c49b3db54643f, type: 3}
-  inverse: 0
 --- !u!1818360609 &8537465515406789701
 RotationConstraint:
   m_ObjectHideFlags: 0
@@ -34041,6 +34025,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a3a48f792b6c2e47b65e35faeed1eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerHead: {fileID: 0}
   playerBody: {fileID: 3884195531135303681}
   localOffset: {x: 0, y: 0.5, z: 0.5}
   playerHealth: {fileID: 2032308166026738529}
@@ -39521,7 +39506,6 @@ GameObject:
   - component: {fileID: 4808849221930994954}
   - component: {fileID: 1487163862559218653}
   - component: {fileID: 8577585446589842290}
-  - component: {fileID: 656683642904923526}
   - component: {fileID: 8880954098963982197}
   - component: {fileID: 9124980649670039458}
   - component: {fileID: 9025062236379844884}
@@ -39647,21 +39631,6 @@ MonoBehaviour:
     m_Duration: 0.1
     m_Frequency: 0
   m_AllowHoverHapticsWhileSelecting: 0
---- !u!114 &656683642904923526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8376238798956588178}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b941932411bed734388674f2dadf94c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  behaviour: {fileID: 1487163862559218653}
-  inputAction: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
-  inverse: 0
 --- !u!1818360609 &8880954098963982197
 RotationConstraint:
   m_ObjectHideFlags: 0
