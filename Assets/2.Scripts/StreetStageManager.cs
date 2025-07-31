@@ -49,6 +49,6 @@ public class StreetStageManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         // °⁄ ΩÃ±€≈Ê¿∏∑Œ »£√‚
-        AudioManager.Instance.PlayNarration("StNarr01");
+        AudioManager2.Instance.PlayNarration("StNarr01");
     }
 }
