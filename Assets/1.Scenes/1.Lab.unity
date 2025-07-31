@@ -1801,7 +1801,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &322258157
 Light:
   m_ObjectHideFlags: 0
@@ -1819,7 +1819,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1852,7 +1852,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -8324,10 +8324,10 @@ LightingSettings:
   m_IndirectOutputScale: 1.025
   m_UsingShadowmask: 0
   m_BakeBackend: 2
-  m_LightmapMaxSize: 128
+  m_LightmapMaxSize: 1024
   m_LightmapSizeFixed: 0
   m_UseMipmapLimits: 1
-  m_BakeResolution: 16
+  m_BakeResolution: 40
   m_Padding: 2
   m_LightmapCompression: 3
   m_AO: 1
@@ -8352,8 +8352,8 @@ LightingSettings:
   m_PVREnvironmentSampleCount: 512
   m_PVREnvironmentReferencePointCount: 2048
   m_LightProbeSampleCountMultiplier: 4
-  m_PVRBounces: 2
-  m_PVRMinBounces: 2
+  m_PVRBounces: 4
+  m_PVRMinBounces: 0
   m_PVREnvironmentImportanceSampling: 0
   m_PVRFilteringMode: 1
   m_PVRDenoiserTypeDirect: 0
@@ -9624,7 +9624,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1487550437}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 0.45056072, g: 0.70754707, b: 0.7075472, a: 1}
@@ -12522,7 +12522,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2044928287
 Transform:
@@ -12572,7 +12572,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 0.7294118, g: 0.91372555, b: 0.8588236, a: 1}
+  m_Color: {r: 0.54254186, g: 0.9056604, b: 0.7953459, a: 1}
   m_Intensity: 6.5
   m_Range: 5.7
   m_SpotAngle: 148.56445
