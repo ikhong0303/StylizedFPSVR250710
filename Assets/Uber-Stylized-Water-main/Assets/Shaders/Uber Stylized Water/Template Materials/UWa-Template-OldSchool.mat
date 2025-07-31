@@ -423,8 +423,8 @@ Material:
     m_Colors:
     - _1st_Wave_Direction: {r: 1, g: 0, b: 0, a: 0}
     - _2nd_Wave_Direction: {r: -1, g: 0, b: 1, a: 0}
-    - _Color_Deep: {r: 0, g: 1, b: 0.804878, a: 0.41568628}
-    - _Color_Shallow: {r: 0, g: 0.4894483, b: 1, a: 0}
+    - _Color_Deep: {r: 0.21226418, g: 1, b: 0.9246101, a: 0.3019608}
+    - _Color_Shallow: {r: 0, g: 0.45051003, b: 1, a: 0}
     - _Deep_Color: {r: 0, g: 0.18142791, b: 0.758, a: 1}
     - _DistanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _FarColor: {r: 0.15966535, g: 0.6787135, b: 0.8679245, a: 0}
@@ -452,7 +452,7 @@ Material:
     - _ShoreLineMaskPanning: {r: 0, g: 0, b: 0, a: 0}
     - _ShoreLineMaskTile: {r: 3, g: 3, b: 0, a: 0}
     - _Specular_Color: {r: 0.0009765625, g: 0.0009765625, b: 0.0009765625, a: 1}
-    - _SurfFoam_Color: {r: 1, g: 1, b: 1, a: 0.31764707}
+    - _SurfFoam_Color: {r: 1, g: 1, b: 1, a: 0.15686275}
     - _SurfFoam_Pan: {r: 0.01, g: 0.01, b: 0, a: 0}
     - _SurfFoam_Tile: {r: 1, g: 1, b: 0, a: 0}
     - _Surface: {r: 1, g: 1, b: 1, a: 1}
