@@ -49,6 +49,7 @@ public class StreetStageManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         // ★ 싱글톤으로 호출
-        AudioManager.Instance.PlayNarration("StNarr01");
+        AudioManager2.Instance.PlayNarration("StNarr01");
+        print("StNarr01 재생");
     }
 }
