@@ -9,6 +9,8 @@ public class StageManager3 : MonoBehaviour
     [SerializeField] private GameObject missionPopupPanel;
     [SerializeField] private GameObject naviLine;
     [SerializeField] private WaterRed waterRed;
+    [SerializeField] private GameObject CloudEffect;
+
 
     private void Start()
     {
@@ -58,7 +60,7 @@ public class StageManager3 : MonoBehaviour
         waterRed.triggerRed = true;
 
         yield return new WaitForSeconds(2f);
-
+        CloudEffect.SetActive(true);
         AudioManager3.Instance.PlaySFX("Garden_Clood");
         AudioManager3.Instance.PlaySFX("Garden_Wind");
         AudioManager3.Instance.PlaySFX("Garden_Thunder");
