@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7385322488067761440}
   - component: {fileID: 6458277676419465854}
   - component: {fileID: 4780786677900356585}
+  - component: {fileID: 6305233142992536371}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Untagged
@@ -126,6 +127,19 @@ MonoBehaviour:
   MaxWobble: 0.0002
   WobbleSpeed: 0.7
   Recovery: 8
+--- !u!114 &6305233142992536371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4474536759341646312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3593408b3eca002478624833e88ce1fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  liquidMaterial: {fileID: 2100000, guid: 1a6d1667dc1fe874b8f7e68408ce9cfe, type: 2}
 --- !u!1001 &6594084083858069252
 PrefabInstance:
   m_ObjectHideFlags: 0
