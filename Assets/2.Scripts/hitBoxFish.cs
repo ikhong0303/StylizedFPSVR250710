@@ -13,7 +13,7 @@ namespace MikeNspired.XRIStarterKit
 
         private void Awake() =>
             damageable = GetComponentInParent<FishHealth>();
-        
+
 
         public void TakeDamage(float damage, GameObject damager)
         {

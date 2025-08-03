@@ -50,6 +50,5 @@ public class StreetStageManager : MonoBehaviour
 
         // ★ 싱글톤으로 호출
         AudioManager2.Instance.PlayNarration("StNarr01");
-        print("StNarr01 재생");
     }
 }

@@ -15,10 +15,23 @@ namespace MikeNspired.XRIStarterKit
 
         private bool isDead = false;
 
+        [Header("테스트용")]
+        [SerializeField] private bool takeDamageTest = false;
+        [SerializeField] private float testDamageAmount = 10f;
+
         private void Awake()
         {
             currentHealth = maxHealth;
             lastDamageTime = -damageCooldown;
+        }
+
+        private void Update()
+        {
+            if (takeDamageTest)
+            {
+                TakeDamage(testDamageAmount, null);
+                takeDamageTest = false; // 호출 후 자동 해제
+            }
         }
 
         public void TakeDamage(float damage, GameObject damager)
@@ -43,7 +56,6 @@ namespace MikeNspired.XRIStarterKit
             isDead = true;
 
             OnDeath?.Invoke();
-
         }
     }
 }

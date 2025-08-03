@@ -25,9 +25,6 @@ using System.Collections;
             StartCoroutine(DisableAfterSeconds(1f));
         }
 
-        /// <summary>
-        /// 일정 시간 후에 총알 오브젝트를 비활성화한다 (오브젝트 풀링 용도).
-        /// </summary>
         /// <param name="seconds">비활성화까지 대기할 시간 (초)</param>
         IEnumerator DisableAfterSeconds(float seconds)
         {

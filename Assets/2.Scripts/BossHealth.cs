@@ -14,11 +14,25 @@ namespace MikeNspired.XRIStarterKit
         public event Action OnDeath; // 죽음 이벤트
 
         private bool isDead = false;
+        public bool IsDead => isDead;
+
+        [Header("테스트용 (Inspector 체크박스)")]
+        public bool testTakeDamage = false;
+        public float testDamageAmount = 10f;
 
         private void Awake()
         {
             currentHealth = maxHealth;
             lastDamageTime = -damageCooldown;
+        }
+
+        private void Update()
+        {
+            if (testTakeDamage)
+            {
+                testTakeDamage = false;
+                TakeDamage(testDamageAmount, null);
+            }
         }
 
         public void TakeDamage(float damage, GameObject damager)
@@ -43,7 +57,6 @@ namespace MikeNspired.XRIStarterKit
             isDead = true;
 
             OnDeath?.Invoke();
-
         }
     }
 }
