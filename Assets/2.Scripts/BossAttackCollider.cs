@@ -7,7 +7,6 @@ using UnityEngine;
 public class BossAttackCollider : MonoBehaviour
 {
     public float damage = 20f;
-    public string playerTag = "Player";
 
     private bool canAttack = false; // 판정 타이밍 제어
 
@@ -25,7 +24,7 @@ public class BossAttackCollider : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!canAttack) return;
-        if (other.CompareTag(playerTag))
+        if (other.CompareTag("Player"))
         {
             // 플레이어에 데미지 적용
             PlayerHealth ph = other.GetComponent<PlayerHealth>();

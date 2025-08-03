@@ -10,6 +10,10 @@ namespace MikeNspired.XRIStarterKit
 
         [SerializeField] private float damageCooldown = 0.1f;
         private float lastDamageTime;
+        public event Action OnTakeDamage;
+
+        public float MaxHealth => maxHealth;
+        public float CurrentHealth => currentHealth;
 
         public event Action OnDeath; // 죽음 이벤트
 
@@ -26,7 +30,7 @@ namespace MikeNspired.XRIStarterKit
             lastDamageTime = -damageCooldown;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (testTakeDamage)
             {
@@ -46,6 +50,8 @@ namespace MikeNspired.XRIStarterKit
 
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+            OnTakeDamage?.Invoke(); // ★ 이 줄 추가!
 
             if (currentHealth <= 0f)
                 Die();

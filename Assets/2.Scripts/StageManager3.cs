@@ -10,6 +10,8 @@ public class StageManager3 : MonoBehaviour
     [SerializeField] private GameObject naviLine;
     [SerializeField] private WaterRed waterRed;
     [SerializeField] private GameObject CloudEffect;
+    [SerializeField] private ParticleSystem particleSystemTarget;
+    [SerializeField] GameObject bossObject;
 
 
     private void Start()
@@ -59,11 +61,28 @@ public class StageManager3 : MonoBehaviour
     {
         waterRed.triggerRed = true;
 
-        yield return new WaitForSeconds(2f);
-        CloudEffect.SetActive(true);
-        AudioManager3.Instance.PlaySFX("Garden_Clood");
+        yield return new WaitForSeconds(1f);
         AudioManager3.Instance.PlaySFX("Garden_Wind");
+        yield return new WaitForSeconds(1f);
+        AudioManager3.Instance.PlaySFX("Garden_Clood");
+        yield return new WaitForSeconds(1f);
         AudioManager3.Instance.PlaySFX("Garden_Thunder");
+
+
+        CloudEffect.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        AudioManager3.Instance.PlayNarration("GardenNarr03");
+        yield return new WaitForSeconds(9f);
+
+        bossObject.SetActive(true);
+        yield return new WaitForSeconds(15f);
+
+        var main = particleSystemTarget.main;
+        Color c = main.startColor.color;
+        c.a = 0.03f;
+        main.startColor = c;
+
+
     }
 
     private void OnDestroy()
