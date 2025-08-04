@@ -13,7 +13,5 @@ public class EnemyActivatorTrigger : MonoBehaviour
         {
             if (enemy != null) enemy.SetActive(true);
         }
-        // 트리거를 다시 사용 못하게 자기 자신 비활성화(옵션)
-        gameObject.SetActive(false);
     }
 }
