@@ -7,6 +7,7 @@ public class LabStageManager : MonoBehaviour
 {
 
     [SerializeField] GameObject missionPopupPanel;
+    [SerializeField] GameObject tutoPopupPanel;
     [SerializeField] Siren siren;
     [SerializeField] DoorKnobTrigger doorKnob;
     [SerializeField] GameObject SceneTrigger01;
@@ -34,6 +35,8 @@ public class LabStageManager : MonoBehaviour
         // 2. ¹Ì¼Ç ÆË¾÷ ¶ç¿ì°í, 2ÃÊ ´ë±â ¡æ ³ª·¹ÀÌ¼Ç2
         yield return new WaitForSeconds(2f);
         missionPopupPanel.SetActive(true);         // ÆË¾÷ ÆÐ³Î ¶ç¿ì±â
+        tutoPopupPanel.SetActive(true);         // ÆË¾÷ ÆÐ³Î ¶ç¿ì±â
+
         yield return new WaitForSeconds(2f);
         AudioManager.Instance.PlayNarration("LabNarr02");
         yield return WaitNarration();

@@ -72,7 +72,7 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!isOpening) return;
 

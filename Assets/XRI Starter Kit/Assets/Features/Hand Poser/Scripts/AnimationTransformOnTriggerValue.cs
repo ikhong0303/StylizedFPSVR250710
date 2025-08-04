@@ -31,7 +31,7 @@ namespace MikeNspired.XRIStarterKit
 
             if (!interactable) interactable = GetComponent<XRGrabInteractable>();
 
-            interactable.selectEntered.AddListener(args => SetController(args));
+            //interactable.selectEntered.AddListener(args => SetController(args));
             interactable.selectExited.AddListener(args => buttons = null);
         }
 
@@ -40,11 +40,11 @@ namespace MikeNspired.XRIStarterKit
             if (!interactable) interactable = GetComponent<XRGrabInteractable>();
         }
 
-        private void SetController(SelectEnterEventArgs args)
-        {
-            if (args.interactorObject is { } interactor)
-                buttons = interactor.transform.GetComponentInParent<HandReference>()?.Hand.GetComponent<XRControllerButtons>();
-        }
+        //private void SetController(SelectEnterEventArgs args)
+        //{
+        //    if (args.interactorObject is { } interactor)
+        //        buttons = interactor.transform.GetComponentInParent<HandReference>()?.Hand.GetComponent<XRControllerButtons>();
+        //}
 
         private void Update()
         {

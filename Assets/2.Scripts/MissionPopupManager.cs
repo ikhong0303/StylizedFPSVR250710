@@ -62,7 +62,7 @@ public class MissionPopupFollower : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         // 만약 씬 전환 등으로 leftWrist가 끊어졌으면 자동 재바인딩 시도
         if (leftWrist == null)

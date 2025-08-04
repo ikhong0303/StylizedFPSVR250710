@@ -72,14 +72,14 @@ public class StageManager3 : MonoBehaviour
         CloudEffect.SetActive(true);
         yield return new WaitForSeconds(5f);
         AudioManager3.Instance.PlayNarration("GardenNarr03");
-        yield return new WaitForSeconds(9f);
+        yield return new WaitForSeconds(14f);
 
         bossObject.SetActive(true);
-        yield return new WaitForSeconds(15f);
+        yield return new WaitForSeconds(12f);
 
         var main = particleSystemTarget.main;
         Color c = main.startColor.color;
-        c.a = 0.03f;
+        c.a = 0.04f;
         main.startColor = c;
 
 

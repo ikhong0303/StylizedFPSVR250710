@@ -41,6 +41,9 @@ public class StreetStageManager : MonoBehaviour
 
     IEnumerator StageFlow()
     {
+        BgmManager.Instance.PlayBGM("Bgm02", true);
+
+
         yield return new WaitForSeconds(3f);
 
         if (missionPopupPanel != null) missionPopupPanel.SetActive(true);
