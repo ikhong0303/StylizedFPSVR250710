@@ -5,11 +5,14 @@ namespace MikeNspired.XRIStarterKit
 {
     public class FishHealth : MonoBehaviour
     {
-        [SerializeField] private float maxHealth = 500f;
+        [SerializeField] private float maxHealth = 100f;
         [SerializeField] private float currentHealth;
 
         [SerializeField] private float damageCooldown = 0.1f;
         private float lastDamageTime;
+        public float CurrentHealth => currentHealth;
+        public float MaxHealth => maxHealth;
+
 
         public event Action OnDeath; // Á×À½ ÀÌº¥Æ®
 
@@ -25,7 +28,7 @@ namespace MikeNspired.XRIStarterKit
             lastDamageTime = -damageCooldown;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (takeDamageTest)
             {

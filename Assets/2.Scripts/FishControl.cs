@@ -1,61 +1,61 @@
 using UnityEngine;
+using MikeNspired.XRIStarterKit;
 
 public class FishControl : MonoBehaviour
 {
-    [Header("연못(원형) 설정")]
-    public Vector3 pondCenter = Vector3.zero;
-    public float pondRadius = 4.0f;
-
-    [Header("중앙 섬(원형 금지영역)")]
-    public Vector3 islandCenter = Vector3.zero;
-    public float islandRadius = 1.0f;
+    [Header("이동할 위치들(좌표)")]
+    public Transform[] waypoints;
 
     [Header("Y(높이) 고정")]
     public float fixedY = 0.5f;
 
-    [Header("속도 랜덤")]
-    public float moveSpeedMin = 1.0f;
-    public float moveSpeedMax = 2.0f;
-    public float speedChangeInterval = 3.0f;
+    [Header("대기 시간")]
+    public float idleTimeMin = 1f;
+    public float idleTimeMax = 3f;
 
-    [Header("목표 뽑기 옵션")]
-    public int maxPickTry = 10;
+    [Header("방향 랜덤 변경 주기")]
+    public float rotationChangeInterval = 2f;   // 몇 초마다 방향 바꿈
+    private float rotationTimer = 0f;
 
-    private float moveSpeed;
-    private float speedTimer = 0f;
+    [Header("방향 변화 최대 각도")]
+    public float maxTurnAngle = 60f;    // 60도(한쪽), 총 120도 범위
+
+    private float moveSpeed = 1f;
+    private int currentWaypoint = 0;
     private Vector3 targetPos;
-
-    private Rigidbody rb;
     private float idleTimer = 0f;
     private bool isMoving = true;
+    private Animator animator;
+    private FishHealth fishHealth;
+    private Quaternion targetRotation;
+    public float rotationLerpSpeed = 3.0f; // 회전 부드러움 속도 (크면 빠름)
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        if (rb == null)
-            Debug.LogError("FishControl: Rigidbody 필요! (isKinematic = true, Gravity Off)");
+        fishHealth = GetComponent<FishHealth>();
+        animator = GetComponent<Animator>();
     }
 
     void Start()
     {
-        SetRandomSpeed();
-        speedTimer = speedChangeInterval;
-        PickNewTarget();
+        if (waypoints == null || waypoints.Length == 0)
+        {
+            Debug.LogError("FishControl: waypoints가 필요합니다!");
+            enabled = false;
+            return;
+            rotationTimer = rotationChangeInterval;
+        }
+
+        currentWaypoint = 0;
+        targetPos = WaypointPos(currentWaypoint);
         SetY();
+        isMoving = true;
     }
 
     void Update()
     {
-        // 속도 랜덤 변화
-        speedTimer -= Time.deltaTime;
-        if (speedTimer <= 0f)
-        {
-            SetRandomSpeed();
-            speedTimer = speedChangeInterval;
-        }
-
-        // Y값 고정
         SetY();
+        UpdateMoveSpeed();
 
         if (!isMoving)
         {
@@ -63,66 +63,84 @@ public class FishControl : MonoBehaviour
             if (idleTimer <= 0f)
             {
                 isMoving = true;
-                PickNewTarget();
+                GotoNextWaypoint();
             }
         }
+        rotationTimer -= Time.deltaTime;
+        if (rotationTimer <= 0f)
+        {
+            SetRandomRotation();
+            rotationTimer = rotationChangeInterval;
+        }
+    }
+
+    void SetRandomRotation()
+    {
+        // 현 이동방향 벡터
+        Vector3 moveDir = (targetPos - transform.position).normalized;
+        if (moveDir.sqrMagnitude < 0.01f) return; // 이동 안하면 무시
+
+        // 이동방향 → 각도(월드)
+        float targetYaw = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
+
+        // ±60도 내에서 랜덤 오프셋
+        float randomOffset = Random.Range(-maxTurnAngle, maxTurnAngle);
+        float newYaw = targetYaw + randomOffset;
+
+        targetRotation = Quaternion.Euler(0, newYaw, 0); // 목표 회전값만 저장!
     }
 
     void FixedUpdate()
     {
-        if (!isMoving || rb == null) return;
+        if (!isMoving) return;
 
         Vector3 next = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.fixedDeltaTime);
         next.y = fixedY;
-        rb.MovePosition(next);
+        transform.position = next; // Rigidbody 없어도 OK
 
-        // 목표 도착
-        if (Vector3.Distance(transform.position, targetPos) < 0.2f)
+        if (Vector3.Distance(next, targetPos) < 0.2f)
         {
             isMoving = false;
-            idleTimer = Random.Range(1f, 3f);
+            idleTimer = Random.Range(idleTimeMin, idleTimeMax);
         }
     }
 
-    void PickNewTarget()
+    void UpdateMoveSpeed()
     {
-        for (int attempt = 0; attempt < maxPickTry; attempt++)
+        if (fishHealth != null)
         {
-            // 연못(큰 원) 내에서만 목표 뽑기
-            Vector2 circle = Random.insideUnitCircle * pondRadius;
-            Vector3 candidate = pondCenter + new Vector3(circle.x, 0, circle.y);
-
-            // 섬(작은 원) 반경 내면 무효
-            if (Vector3.Distance(candidate, islandCenter) < islandRadius + 0.3f)
-                continue;
-            // 너무 가까우면 무효
-            if (Vector3.Distance(candidate, transform.position) < 0.6f)
-                continue;
-
-            candidate.y = fixedY;
-            targetPos = candidate;
-            return;
+            float hpRatio = fishHealth.CurrentHealth / fishHealth.MaxHealth;
+            if (hpRatio <= 0.5f)
+            {
+                moveSpeed = 3f;
+                if (animator != null) animator.SetBool("isFast", true);
+            }
+            else
+            {
+                moveSpeed = 0.5f;
+                if (animator != null) animator.SetBool("isFast", false);
+            }
         }
-        // 실패 시라도 아무 좌표
-        Vector2 backupCircle = Random.insideUnitCircle * pondRadius;
-        targetPos = pondCenter + new Vector3(backupCircle.x, 0, backupCircle.y);
-        targetPos.y = fixedY;
     }
 
-    void SetRandomSpeed() => moveSpeed = Random.Range(moveSpeedMin, moveSpeedMax);
+    void GotoNextWaypoint()
+    {
+        // ★ 순차 루프!
+        currentWaypoint = (currentWaypoint + 1) % waypoints.Length;
+        targetPos = WaypointPos(currentWaypoint);
+    }
+
+    Vector3 WaypointPos(int idx)
+    {
+        var pos = waypoints[idx].position;
+        pos.y = fixedY;
+        return pos;
+    }
 
     void SetY()
     {
         Vector3 pos = transform.position;
         pos.y = fixedY;
         transform.position = pos;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(pondCenter, pondRadius);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(islandCenter, islandRadius);
     }
 }
