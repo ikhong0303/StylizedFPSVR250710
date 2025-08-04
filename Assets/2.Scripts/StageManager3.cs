@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class StageManager3 : MonoBehaviour
 {
-    [SerializeField] private FishHealth fishHealth;
+    [SerializeField] private FishDeath fishDeath;
     [SerializeField] private GameObject missionPopupPanel;
     [SerializeField] private GameObject naviLine;
     [SerializeField] private WaterRed waterRed;
@@ -30,16 +30,15 @@ public class StageManager3 : MonoBehaviour
             }
         }
 
-        if (fishHealth != null)
-        {
-            fishHealth.OnDeath += OnFishDeath;
-        }
+        if (fishDeath != null)
+            fishDeath.OnSinkStart += OnFishSinkStart;
 
         StartCoroutine(StageFlow());
     }
 
     private IEnumerator StageFlow()
     {
+        BgmManager.Instance.PlayBGM("Bgm05");
         yield return new WaitForSeconds(3f);
 
         if (missionPopupPanel != null)
@@ -52,7 +51,7 @@ public class StageManager3 : MonoBehaviour
         AudioManager3.Instance.PlayNarration("GardenNarr01");
     }
 
-    private void OnFishDeath()
+    private void OnFishSinkStart()
     {
         StartCoroutine(PlayDeathSFXSequence());
     }
@@ -72,14 +71,15 @@ public class StageManager3 : MonoBehaviour
         CloudEffect.SetActive(true);
         yield return new WaitForSeconds(5f);
         AudioManager3.Instance.PlayNarration("GardenNarr03");
-        yield return new WaitForSeconds(14f);
+        BgmManager.Instance.PlayBGM("Bgm06");
+        yield return new WaitForSeconds(11.8f);
 
         bossObject.SetActive(true);
         yield return new WaitForSeconds(12f);
 
         var main = particleSystemTarget.main;
         Color c = main.startColor.color;
-        c.a = 0.04f;
+        c.a = 0.15f;
         main.startColor = c;
 
 
@@ -87,9 +87,7 @@ public class StageManager3 : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (fishHealth != null)
-        {
-            fishHealth.OnDeath -= OnFishDeath;
-        }
+        if (fishDeath != null)
+            fishDeath.OnSinkStart -= OnFishSinkStart;
     }
 }

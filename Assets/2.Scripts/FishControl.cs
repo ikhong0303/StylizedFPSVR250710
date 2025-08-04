@@ -13,27 +13,45 @@ public class FishControl : MonoBehaviour
     public float idleTimeMin = 1f;
     public float idleTimeMax = 3f;
 
-    [Header("방향 랜덤 변경 주기")]
-    public float rotationChangeInterval = 2f;   // 몇 초마다 방향 바꿈
-    private float rotationTimer = 0f;
+    [Header("이동속도")]
+    public float normalSpeed = 0.5f;
+    public float fastSpeed = 3f;
 
-    [Header("방향 변화 최대 각도")]
-    public float maxTurnAngle = 60f;    // 60도(한쪽), 총 120도 범위
+    [Header("회전 관련")]
+    public float rotationChangeInterval = 2f;    // 몇 초마다 방향 바꿈
+    public float rotationLerpSpeed = 4.0f;       // 회전 부드러움 속도
+    public float maxTurnAngle = 60f;             // ±60도 (총 120도)
 
-    private float moveSpeed = 1f;
     private int currentWaypoint = 0;
     private Vector3 targetPos;
+    private Rigidbody rb;
     private float idleTimer = 0f;
     private bool isMoving = true;
     private Animator animator;
     private FishHealth fishHealth;
+    private bool isDead = false;
+
+    // 방향 랜덤 관련
+    private float rotationTimer = 0f;
     private Quaternion targetRotation;
-    public float rotationLerpSpeed = 3.0f; // 회전 부드러움 속도 (크면 빠름)
+
+    private float moveSpeed = 1f;
 
     void Awake()
     {
+        rb = GetComponent<Rigidbody>();
         fishHealth = GetComponent<FishHealth>();
         animator = GetComponent<Animator>();
+
+        if (fishHealth != null)
+            fishHealth.OnDeath += OnFishDeath;
+    }
+
+    private void OnFishDeath()
+    {
+        isDead = true;
+        isMoving = false;  // 즉시 멈춤
+                           // 추가로, 멈춰야 하는 게 있다면 여기서 멈춤 처리!
     }
 
     void Start()
@@ -43,19 +61,35 @@ public class FishControl : MonoBehaviour
             Debug.LogError("FishControl: waypoints가 필요합니다!");
             enabled = false;
             return;
-            rotationTimer = rotationChangeInterval;
         }
 
         currentWaypoint = 0;
         targetPos = WaypointPos(currentWaypoint);
         SetY();
         isMoving = true;
+
+        // 초기 회전 설정
+        targetRotation = transform.rotation;
+        rotationTimer = rotationChangeInterval;
     }
 
     void Update()
     {
+        if (isDead) return;
+
         SetY();
         UpdateMoveSpeed();
+
+        // 부드럽게 회전
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationLerpSpeed);
+
+        // 일정 주기로 새로운 방향으로 부드럽게 회전
+        rotationTimer -= Time.deltaTime;
+        if (rotationTimer <= 0f)
+        {
+            SetRandomRotation();
+            rotationTimer = rotationChangeInterval;
+        }
 
         if (!isMoving)
         {
@@ -66,37 +100,21 @@ public class FishControl : MonoBehaviour
                 GotoNextWaypoint();
             }
         }
-        rotationTimer -= Time.deltaTime;
-        if (rotationTimer <= 0f)
-        {
-            SetRandomRotation();
-            rotationTimer = rotationChangeInterval;
-        }
-    }
-
-    void SetRandomRotation()
-    {
-        // 현 이동방향 벡터
-        Vector3 moveDir = (targetPos - transform.position).normalized;
-        if (moveDir.sqrMagnitude < 0.01f) return; // 이동 안하면 무시
-
-        // 이동방향 → 각도(월드)
-        float targetYaw = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
-
-        // ±60도 내에서 랜덤 오프셋
-        float randomOffset = Random.Range(-maxTurnAngle, maxTurnAngle);
-        float newYaw = targetYaw + randomOffset;
-
-        targetRotation = Quaternion.Euler(0, newYaw, 0); // 목표 회전값만 저장!
     }
 
     void FixedUpdate()
     {
+        if (isDead) return;
         if (!isMoving) return;
 
+        // Rigidbody가 있다면 MovePosition, 없으면 transform.position
         Vector3 next = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.fixedDeltaTime);
         next.y = fixedY;
-        transform.position = next; // Rigidbody 없어도 OK
+
+        if (rb != null)
+            rb.MovePosition(next);
+        else
+            transform.position = next;
 
         if (Vector3.Distance(next, targetPos) < 0.2f)
         {
@@ -112,12 +130,12 @@ public class FishControl : MonoBehaviour
             float hpRatio = fishHealth.CurrentHealth / fishHealth.MaxHealth;
             if (hpRatio <= 0.5f)
             {
-                moveSpeed = 3f;
+                moveSpeed = fastSpeed;
                 if (animator != null) animator.SetBool("isFast", true);
             }
             else
             {
-                moveSpeed = 0.5f;
+                moveSpeed = normalSpeed;
                 if (animator != null) animator.SetBool("isFast", false);
             }
         }
@@ -125,9 +143,11 @@ public class FishControl : MonoBehaviour
 
     void GotoNextWaypoint()
     {
-        // ★ 순차 루프!
         currentWaypoint = (currentWaypoint + 1) % waypoints.Length;
         targetPos = WaypointPos(currentWaypoint);
+
+        // 도착 후 새로운 목표로 회전도 갱신
+        SetRandomRotation();
     }
 
     Vector3 WaypointPos(int idx)
@@ -142,5 +162,18 @@ public class FishControl : MonoBehaviour
         Vector3 pos = transform.position;
         pos.y = fixedY;
         transform.position = pos;
+    }
+
+    void SetRandomRotation()
+    {
+        Vector3 moveDir = (targetPos - transform.position).normalized;
+        if (moveDir.sqrMagnitude < 0.01f) return; // 이동 안하면 무시
+
+        // 목표 지점 방향
+        float targetYaw = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
+        float randomOffset = Random.Range(-maxTurnAngle, maxTurnAngle);
+        float newYaw = targetYaw + randomOffset;
+
+        targetRotation = Quaternion.Euler(0, newYaw, 0);
     }
 }
