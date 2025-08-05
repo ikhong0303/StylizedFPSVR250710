@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using GuidanceLine;
 using UnityEditor.EditorTools;
+using MikeNspired.XRIStarterKit.ChrisNolet;
 
 public class LabStageManager : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class LabStageManager : MonoBehaviour
     [SerializeField] DoorKnobTrigger doorKnob;
     [SerializeField] GameObject SceneTrigger01;
     [SerializeField] GameObject LabDoor;
+    [SerializeField] private Outline targetOutline;
+    [SerializeField] private Outline leftGun;
+    [SerializeField] private Outline rightGun;
+
 
     public int leverPulledCount = 0;
     public bool BothLeversPulled => leverPulledCount >= 2;
@@ -21,6 +26,14 @@ public class LabStageManager : MonoBehaviour
 
     private void Start()
     {
+        if (targetOutline != null)
+            targetOutline.enabled = false;
+        if (leftGun != null)
+            leftGun.enabled = false;
+        if (rightGun != null)
+            rightGun.enabled = false;
+
+
         StartCoroutine(StageFlow());
     }
 
@@ -39,10 +52,17 @@ public class LabStageManager : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
         AudioManager.Instance.PlayNarration("LabNarr02");
+        if (leftGun != null)
+            leftGun.enabled = true;
+        if (rightGun != null)
+            rightGun.enabled = true;
+
         yield return WaitNarration();
 
         // 3. È¦½ºÅÍ¿¡ ÃÑ ¼ö³³µÉ ¶§±îÁö ´ë±â ¡æ °æ°íÀ½/°æ±¤µî
         yield return new WaitUntil(() => siren.BothHolstered);
+        if (targetOutline != null)
+            targetOutline.enabled = true;
         yield return new WaitForSeconds(3f);
         AudioManager.Instance.PlayNarration("LabNarr03");
         yield return WaitNarration();

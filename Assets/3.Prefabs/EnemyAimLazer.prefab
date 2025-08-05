@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8623982929253480833}
   - component: {fileID: 606654833056646746}
   - component: {fileID: 4820747623059158535}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: EnemyAimLazer
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -304,6 +304,8 @@ public class BossControl : MonoBehaviour
     {
         ChangeState(BossState.Death);
         Debug.Log("Boss Dead!");
+        if (healthBarInstance != null)
+            healthBarInstance.gameObject.SetActive(false);
     }
 
     void NormalizeProbabilities()

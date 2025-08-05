@@ -9,7 +9,7 @@ public class PlayerHitEffect : MonoBehaviour
     private Coroutine hitRoutine;
 
     // 데미지 받으면 이 함수 호출!
-    public void ShowHitEffect(float duration = 0.3f, float alpha = 0.5f)
+    public void ShowHitEffect(float duration = 0.6f, float alpha = 0.5f)
     {
         if (hitRoutine != null)
             StopCoroutine(hitRoutine);

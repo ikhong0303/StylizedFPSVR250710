@@ -57,6 +57,11 @@ namespace MikeNspired.XRIStarterKit
         // 충돌 표면의 타입에 따라 적절한 데칼을 생성
         private void CheckForImpactDecalType(Collision collision)
         {
+            // Neutral 레이어는 데칼 생성하지 않음
+            // (Project Settings > Tags and Layers에서 Neutral 레이어 생성 필요)
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Neutral"))
+                return;
+
             var impact = collision.transform.GetComponentInParent<IImpactType>();
 
             if (impact != null)
@@ -75,18 +80,20 @@ namespace MikeNspired.XRIStarterKit
                         SpawnDecal(collision, woodDecal, shouldReparent);
                         break;
                     case ImpactType.Neutral:
-                        SpawnDecal(collision, null, shouldReparent);
-                        break;
+                        // IImpactType이 Neutral이면 데칼 무시
+                        return;
                     default:
                         SpawnDecal(collision, metalDecal, shouldReparent);
                         break;
                 }
             }
-            //else
-            //    // IImpactType이 없으면 기본적으로 metal 데칼 생성
+            else
+            {
+                // IImpactType이 없으면 기본적으로 metal 데칼 생성
                 SpawnDecal(collision, metalDecal, false);
-                SpawnDecal(collision, metalDecal, false);
+            }
         }
+
 
         // 데칼 프리팹을 충돌 지점에 생성하고, 필요시 부모를 설정
         private static void SpawnDecal(Collision hit, GameObject decalPrefab, bool shouldReparent)

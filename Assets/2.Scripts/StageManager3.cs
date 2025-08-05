@@ -12,6 +12,7 @@ public class StageManager3 : MonoBehaviour
     [SerializeField] private GameObject CloudEffect;
     [SerializeField] private ParticleSystem particleSystemTarget;
     [SerializeField] GameObject bossObject;
+    [SerializeField] private BossHealth bossHealth;
 
 
     private void Start()
@@ -32,6 +33,8 @@ public class StageManager3 : MonoBehaviour
 
         if (fishDeath != null)
             fishDeath.OnSinkStart += OnFishSinkStart;
+        if (bossHealth != null)
+            bossHealth.OnDeath += OnBossDeath;
 
         StartCoroutine(StageFlow());
     }
@@ -85,9 +88,27 @@ public class StageManager3 : MonoBehaviour
 
     }
 
+    private void OnBossDeath()
+    {
+        StartCoroutine(BossDeathSequence());
+    }
+
+    private IEnumerator BossDeathSequence()
+    {
+        Debug.Log("보스 사망! 여기서부터 코루틴 동작.");
+
+        yield return new WaitForSeconds(8f);
+        AudioManager3.Instance.PlayNarration("GardenNarr02");
+        // 원하는 연출, UI, 이펙트 등...
+
+        yield break; 
+    }
+
     private void OnDestroy()
     {
         if (fishDeath != null)
             fishDeath.OnSinkStart -= OnFishSinkStart;
+        if (bossHealth != null)
+            bossHealth.OnDeath -= OnBossDeath;
     }
 }

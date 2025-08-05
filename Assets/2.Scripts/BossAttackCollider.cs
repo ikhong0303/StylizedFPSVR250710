@@ -6,24 +6,15 @@ using UnityEngine;
 /// </summary>
 public class BossAttackCollider : MonoBehaviour
 {
-    public float damage = 20f;
+    public float damage = 10f;
 
-    private bool canAttack = false; // 판정 타이밍 제어
 
     // Animation Event에서 호출 (판정 켜기)
-    public void AttackActivate()
-    {
-        canAttack = true;
-    }
-    // Animation Event에서 호출 (판정 끄기)
-    public void AttackDeactivate()
-    {
-        canAttack = false;
-    }
+
+    
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!canAttack) return;
         if (other.CompareTag("Player"))
         {
             // 플레이어에 데미지 적용
