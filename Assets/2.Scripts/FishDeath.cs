@@ -7,7 +7,7 @@ namespace MikeNspired.XRIStarterKit
     {
         [SerializeField] private FishHealth fishHealth;
         [SerializeField] private Animator animator;
-        [SerializeField] private Rigidbody rb;
+        // [SerializeField] private Rigidbody rb;   // ← 완전 삭제
 
         // 연출 파라미터
         public float deathRotateZ = 90f;
@@ -18,7 +18,6 @@ namespace MikeNspired.XRIStarterKit
         public float sinkDuration = 2.0f;
         public float sinkDistance = 1.0f;
         public event System.Action OnSinkStart;
-
 
         private void Awake()
         {
@@ -38,18 +37,15 @@ namespace MikeNspired.XRIStarterKit
 
         private IEnumerator DeathRoutine()
         {
+            AudioManager3.Instance.PlaySFX("Fish_Death"); // 물고기 죽음 사운드 재생
             if (animator != null)
             {
                 animator.SetTrigger("Die");    // Death 빈 상태로 이동
-                yield return new WaitForSeconds(1f); 
+                yield return new WaitForSeconds(1f);
                 animator.enabled = false;      // 완전히 꺼서 이후 연출 제어
             }
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                rb.isKinematic = true;
-            }
+            // Rigidbody 관련 코드 완전 제거!
+            // if (rb != null) { ... } ← 통째로 삭제
 
             BgmManager.Instance.StopBGM(); // BGM 정지
             // Z축 회전 (동일)

@@ -10,11 +10,12 @@ namespace MikeNspired.XRIStarterKit
 
         [SerializeField] private float damageCooldown = 0.1f;
         private float lastDamageTime;
+
+        [SerializeField] private FishFlashEffect flashEffect;
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
 
-
-        public event Action OnDeath; // 죽음 이벤트
+        public event Action OnDeath;
 
         private bool isDead = false;
 
@@ -26,6 +27,10 @@ namespace MikeNspired.XRIStarterKit
         {
             currentHealth = maxHealth;
             lastDamageTime = -damageCooldown;
+
+            // 자동 할당
+            if (flashEffect == null)
+                flashEffect = GetComponent<FishFlashEffect>();
         }
 
         private void FixedUpdate()
@@ -33,21 +38,25 @@ namespace MikeNspired.XRIStarterKit
             if (takeDamageTest)
             {
                 TakeDamage(testDamageAmount, null);
-                takeDamageTest = false; // 호출 후 자동 해제
+                takeDamageTest = false;
             }
         }
 
         public void TakeDamage(float damage, GameObject damager)
         {
-            if (isDead) return;
 
+            Debug.Log($"[FishHealth] 실제 체력 감소 호출! damage: {damage} (Before: {currentHealth})");
+            if (isDead) return;
             if (Time.time - lastDamageTime < damageCooldown)
                 return;
 
             lastDamageTime = Time.time;
-
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+            // ★ 피격 플래시
+            if (flashEffect != null)
+                flashEffect.Flash();
 
             if (currentHealth <= 0f)
                 Die();
@@ -57,7 +66,6 @@ namespace MikeNspired.XRIStarterKit
         {
             if (isDead) return;
             isDead = true;
-
             OnDeath?.Invoke();
         }
     }

@@ -62,9 +62,9 @@ namespace MikeNspired.XRIStarterKit
                 Remap(volume, 0, 1, 0, maxVolume);
 
             // 효과음 클립 중 랜덤으로 하나 선택
-            AudioClip randomClip = Clips[Random.Range(0, Clips.Length)];
-            audioSource.clip = randomClip;
-            audioSource.volume = volume;
+            //AudioClip randomClip = Clips[Random.Range(0, Clips.Length)];
+            //audioSource.clip = randomClip;
+            //audioSource.volume = volume;
 
             // 효과음 재생!
             audioSource.Play();

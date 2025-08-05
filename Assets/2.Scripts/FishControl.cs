@@ -24,7 +24,6 @@ public class FishControl : MonoBehaviour
 
     private int currentWaypoint = 0;
     private Vector3 targetPos;
-    private Rigidbody rb;
     private float idleTimer = 0f;
     private bool isMoving = true;
     private Animator animator;
@@ -39,7 +38,6 @@ public class FishControl : MonoBehaviour
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
         fishHealth = GetComponent<FishHealth>();
         animator = GetComponent<Animator>();
 
@@ -107,14 +105,11 @@ public class FishControl : MonoBehaviour
         if (isDead) return;
         if (!isMoving) return;
 
-        // Rigidbody가 있다면 MovePosition, 없으면 transform.position
+        // transform.position 만 사용
         Vector3 next = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.fixedDeltaTime);
         next.y = fixedY;
 
-        if (rb != null)
-            rb.MovePosition(next);
-        else
-            transform.position = next;
+        transform.position = next;
 
         if (Vector3.Distance(next, targetPos) < 0.2f)
         {

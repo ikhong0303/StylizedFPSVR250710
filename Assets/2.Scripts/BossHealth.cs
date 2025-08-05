@@ -11,6 +11,7 @@ namespace MikeNspired.XRIStarterKit
         [SerializeField] private float damageCooldown = 0.1f;
         private float lastDamageTime;
         public event Action OnTakeDamage;
+        [SerializeField] BossFlashEffect bossFlashEffect;
 
         public float MaxHealth => maxHealth;
         public float CurrentHealth => currentHealth;
@@ -28,6 +29,9 @@ namespace MikeNspired.XRIStarterKit
         {
             currentHealth = maxHealth;
             lastDamageTime = -damageCooldown;
+            if (bossFlashEffect == null)
+                bossFlashEffect = GetComponent<BossFlashEffect>();
+            OnTakeDamage += bossFlashEffect.Flash;
         }
 
         private void FixedUpdate()

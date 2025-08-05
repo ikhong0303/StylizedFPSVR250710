@@ -15,6 +15,8 @@ public class BossControl : MonoBehaviour
     [Header("공격 패턴 설정")]
     public float[] attackDistances = new float[4] { 4.5f, 3.5f, 6f, 7f }; // 각 공격별 사거리
     [Range(0f, 1f)] public float[] attackProbabilities = new float[4] { 0.3f, 0.3f, 0.2f, 0.2f }; // 각 공격별 확률(합 1.0)
+    public AudioClip[] attackVoices;
+    [SerializeField] private AudioSource audioSource;
 
     private int nextAttackIndex = 0;
 
@@ -26,6 +28,7 @@ public class BossControl : MonoBehaviour
     private NavMeshAgent agent;
     private BossHealth bossHealth;
     private Animator animator;
+
 
     [Header("등장 연출 설정")]
     public Transform appearPoint;        // 등장 지점 (씬에서 따로 empty로 만들어서 할당)
@@ -68,6 +71,14 @@ public class BossControl : MonoBehaviour
         state = BossState.Appear;
         hasRoared = false;
         agent.speed = appearSpeed;
+    }
+
+    void PlayAttackVoice(int attackIndex)
+    {
+        if (attackVoices == null || attackVoices.Length <= attackIndex) return;
+        var clip = attackVoices[attackIndex];
+        if (clip != null && audioSource != null)
+            audioSource.PlayOneShot(clip);
     }
 
     void FixedUpdate()
@@ -208,6 +219,7 @@ public class BossControl : MonoBehaviour
                 animator.SetInteger("attackIndex", nextAttackIndex);
                 animator.SetTrigger("Attack");
                 lastAttackTime = Time.time;
+                PlayAttackVoice(nextAttackIndex);
                 break;
 
             case BossState.React:

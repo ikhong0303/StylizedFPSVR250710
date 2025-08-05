@@ -14,11 +14,11 @@ using TMPro;
 
 namespace MikeNspired.XRIStarterKit
 {
-    // ProjectileWeapon: VR에서 사용하는 총기 발사 및 반동, 탄창, 이펙트 제어
     public class ProjectileWeapon : MonoBehaviour
     {
         [Header("필수")]
-        [SerializeField] private Transform firePoint;              // 총알이 나가는 위치
+        [SerializeField] private Transform bulletFirePoint;        // ★ 총알이 나가는 위치
+        [SerializeField] private Transform laserFirePoint;         // ★ 레이저 시작 위치
         [SerializeField] private Rigidbody projectilePrefab;       // 발사될 총알 프리팹
         [SerializeField] private AudioSource fireAudio;            // 발사 사운드
         [SerializeField] private ParticleSystem cartridgeEjection; // 탄피 이펙트
@@ -26,15 +26,16 @@ namespace MikeNspired.XRIStarterKit
         [SerializeField] private Transform cylinderTransform;      // 실린더(회전용 부모)
         [SerializeField] private List<GameObject> bullets;         // 실린더 안에 보이는 총알 오브젝트(6개 등)
 
-
         [Header("설정")]
         [SerializeField] private float bulletSpeed = 150f;         // 총알 속도
         [SerializeField] private float cylinderAngle = 60f;        // 실린더 회전 각도
-        [SerializeField] private float cylinderRotateDuration = 0.2f;   // ★ 부드러운 회전 지속시간
+        [SerializeField] private float cylinderRotateDuration = 0.2f;   // 부드러운 회전 지속시간
         [SerializeField] private TextMeshProUGUI ammoTextUI;       // UI용 TMP
 
-        public Transform aimPointer;     // 조준점 오브젝트(스피어, 플랫 스프라이트 등)
-        public float aimMaxDistance = 100f; // 최대 표시 거리
+        [Header("Laser Pointer")]
+        [SerializeField] private GameObject laserPrefab;           // Emission 머티리얼 원기둥 프리팹
+        [SerializeField] private float laserMaxDistance = 20f;     // 최대 거리 (Inspector에서 조절)
+        private GameObject activeLaser;
 
         public float recoilAmount = -0.03f;                        // 반동 이동 거리
         public float recoilRotation = 1;                           // 반동 회전
@@ -43,8 +44,8 @@ namespace MikeNspired.XRIStarterKit
         public float hapticStrength = 0.5f;                        // 햅틱 강도
 
         [Header("재장전 (Tilt Reload)")]
-        [SerializeField] private float reloadAngle = 60f;      // 아래로 얼마나 기울이면 재장전되는지 (degree)
-        [SerializeField] private float reloadCooldown = 1f;    // 재장전 연타 방지 쿨타임(초)
+        [SerializeField] private float reloadAngle = 60f;          // 아래로 얼마나 기울이면 재장전되는지 (degree)
+        [SerializeField] private float reloadCooldown = 1f;        // 재장전 연타 방지 쿨타임(초)
 
         // XR
         private XRGrabInteractable interactable;
@@ -77,16 +78,20 @@ namespace MikeNspired.XRIStarterKit
             if (ammoTextUI != null)
                 ammoTextUI.enabled = false;
 
+            // ★ 반드시 추가! ★
+            if (laserPrefab != null && activeLaser == null)
+                activeLaser = Instantiate(laserPrefab, laserFirePoint.position, Quaternion.identity, transform);
+            if (activeLaser != null)
+                activeLaser.SetActive(false);
         }
 
         private void FixedUpdate()
         {
             if (interactable.isSelected && controller != null)
             {
-                var gunForward = firePoint.forward.normalized;
+                var gunForward = bulletFirePoint.forward.normalized;
                 float dot = Vector3.Dot(gunForward, Vector3.down); // 아래=+1, 위=-1
 
-                // 140도 기준이면 0.766f, 아래든 위든 상관없이 장전
                 if (Mathf.Abs(dot) > 0.766f && Time.time - lastReloadTime > reloadCooldown)
                 {
                     Reload();
@@ -94,15 +99,42 @@ namespace MikeNspired.XRIStarterKit
                 }
             }
 
+            UpdateLaserPointer(); // 에임포인터 관련 코드 완전 제거!
+        }
+
+        private void UpdateLaserPointer()
+        {
+            XRBaseInteractor currInteractor = null;
+            if (interactable != null && interactable.interactorsSelecting.Count > 0)
+                currInteractor = (XRBaseInteractor)interactable.interactorsSelecting[0];
+
+            bool inSocket = currInteractor is XRSocketInteractor;
+
+            if (!interactable.isSelected || inSocket)
+            {
+                if (activeLaser != null) activeLaser.SetActive(false);
+                return;
+            }
+
+            float maxDist = laserMaxDistance;
+
             RaycastHit hit;
-            Vector3 targetPos;
-            if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, aimMaxDistance))
-                targetPos = hit.point;
-            else
-                targetPos = firePoint.position + firePoint.forward * aimMaxDistance;
+            Vector3 start = laserFirePoint.position;
+            Vector3 dir = laserFirePoint.forward;
+            bool hasHit = Physics.Raycast(start, dir, out hit, maxDist);
 
-            aimPointer.position = targetPos;
+            float dist = hasHit ? hit.distance : maxDist;
 
+            if (activeLaser != null)
+            {
+                // Cylinder: Y축 위, scale.y = 길이/2
+                activeLaser.transform.position = start + dir * (dist * 0.5f);
+                activeLaser.transform.rotation = Quaternion.LookRotation(dir) * Quaternion.Euler(90, 0, 0);
+                Vector3 scale = activeLaser.transform.localScale;
+                scale.y = dist * 0.5f;
+                activeLaser.transform.localScale = scale;
+                activeLaser.SetActive(true);
+            }
         }
 
         public void FireGun()
@@ -119,8 +151,8 @@ namespace MikeNspired.XRIStarterKit
             bullets[currentBulletIndex].SetActive(false);
 
             // 발사체 생성 및 힘 적용
-            var bullet = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-            bullet.AddForce(firePoint.forward * bulletSpeed, ForceMode.VelocityChange);
+            var bullet = Instantiate(projectilePrefab, bulletFirePoint.position, bulletFirePoint.rotation);
+            bullet.AddForce(bulletFirePoint.forward * bulletSpeed, ForceMode.VelocityChange);
 
             // 사운드, 이펙트
             fireAudio?.PlayOneShot(fireAudio.clip);
@@ -130,8 +162,8 @@ namespace MikeNspired.XRIStarterKit
             if (bulletFlash)
             {
                 var flash = Instantiate(bulletFlash);
-                flash.transform.position = firePoint.position;
-                flash.positionToMatch = firePoint;
+                flash.transform.position = bulletFirePoint.position;
+                flash.positionToMatch = bulletFirePoint;
             }
 
             // 햅틱(진동)
@@ -143,11 +175,7 @@ namespace MikeNspired.XRIStarterKit
 
             BulletFiredEvent?.Invoke();
 
-            //// 실린더 회전
-            //if (cylinderTransform)
-            //    cylinderTransform.localRotation *= Quaternion.Euler(0, 0, -cylinderAngle);
-
-            // ▶ 실린더 회전을 부드럽게!
+            // 실린더 회전
             if (cylinderTransform)
             {
                 float targetAngle = -(currentBulletIndex + 1) * cylinderAngle;
@@ -162,19 +190,15 @@ namespace MikeNspired.XRIStarterKit
                 FiredLastBulletEvent?.Invoke();
 
             // 반동
-            //StopAllCoroutines();
             StartRecoil();
             UpdateAmmoTextUI();
-            
         }
 
-        // ★ 실린더(총알 그룹) 부드러운 회전 코루틴
         private IEnumerator RotateCylinderSmooth(float targetAngle, float duration)
         {
             isCylinderRotating = true;
 
             float startAngle = cylinderTransform.localEulerAngles.z;
-            // 각도 차이 계산(0~360 기준으로 보정)
             float endAngle = targetAngle;
             if (endAngle - startAngle > 180f) startAngle += 360f;
             if (startAngle - endAngle > 180f) endAngle += 360f;
@@ -211,17 +235,22 @@ namespace MikeNspired.XRIStarterKit
             }
         }
 
-
-
-        // ==== 아래는 반동 코드(원본 유지) ====
         private void SetupRecoilVariables(SelectEnterEventArgs args)
         {
             controller = args.interactorObject as XRBaseInteractor;
             StartCoroutine(SetupRecoil(interactable.attachEaseInTime));
 
-            if (ammoTextUI != null)
-                ammoTextUI.enabled = true;
+            if (controller is XRSocketInteractor)
+            {
+                if (ammoTextUI != null) ammoTextUI.enabled = false;
+                if (activeLaser != null) activeLaser.SetActive(false);
+                return;
+            }
+
+            if (ammoTextUI != null) ammoTextUI.enabled = true;
+            if (activeLaser != null) activeLaser.SetActive(true);
         }
+
         private void DestroyRecoilTracker(SelectExitEventArgs args)
         {
             StopAllCoroutines();
@@ -230,7 +259,10 @@ namespace MikeNspired.XRIStarterKit
 
             if (ammoTextUI != null)
                 ammoTextUI.enabled = false;
+            if (activeLaser != null)
+                activeLaser.SetActive(false);
         }
+
         private System.Collections.IEnumerator SetupRecoil(float interactableAttachEaseInTime)
         {
             if (controller == null) yield break;
