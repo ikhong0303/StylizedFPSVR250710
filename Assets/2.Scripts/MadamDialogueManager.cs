@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections; // 코루틴 사용 필수
+
 
 public class MadamDialogueManager : MonoBehaviour
 {
@@ -9,6 +11,8 @@ public class MadamDialogueManager : MonoBehaviour
     public AudioClip[] linesAudio;
     [TextArea(2, 5)] // Inspector에서 미리보기용 (필수는 아님)
     public string[] linesText; // Inspector에서 입력하지 않을 거라 초기화만
+    public float typingSpeed = 0.04f; // 한 글자당 딜레이(초)
+    Coroutine typingCoroutine; // 중복 방지용
 
     public TextMeshProUGUI subtitleText;
     public GameObject subtitlePanel;
@@ -65,7 +69,21 @@ public class MadamDialogueManager : MonoBehaviour
             audioSource.clip = linesAudio[currentLine];
             audioSource.Play();
         }
-        subtitleText.text = linesText[currentLine];
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeSubtitle(linesText[currentLine]));
+    }
+
+    IEnumerator TypeSubtitle(string line)
+    {
+        subtitleText.text = "";
+        foreach (char c in line)
+        {
+            subtitleText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
+        typingCoroutine = null;
     }
 
     void EndDialogue()

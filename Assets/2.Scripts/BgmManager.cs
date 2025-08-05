@@ -32,6 +32,8 @@ public class BgmManager : MonoBehaviour
     public float fadeDuration = 1.0f; // 페이드 in/out 소요 시간(초)
 
     private Coroutine fadeCoroutine;   // 중복 Fade 방지용 코루틴 핸들
+    private string currentBgmID;      // 현재 재생 중인 BGM의 ID
+    private int currentIndex = -1;    // 현재 리스트 내 인덱스
 
     // 싱글톤/딕셔너리 세팅
     void Awake()
@@ -61,9 +63,13 @@ public class BgmManager : MonoBehaviour
     {
         if (bgmDict.TryGetValue(id, out var data) && data.clip != null)
         {
+            currentBgmID = id;
+            // 인덱스도 찾아서 저장
+            currentIndex = bgmList.FindIndex(b => b.bgmID == id);
+
+            // 이하 기존 코드 그대로...
             if (fade)
             {
-                // 기존 Fade가 진행 중이면 정지
                 if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
                 fadeCoroutine = StartCoroutine(FadeToBGM(data.clip, data.volume));
             }
@@ -135,4 +141,22 @@ public class BgmManager : MonoBehaviour
         }
         bgmSource.Stop();
     }
+
+    public void PlayNextBGM(bool fade = true)
+    {
+        if (bgmList == null || bgmList.Count == 0)
+        {
+            Debug.LogWarning("[BGMManager] bgmList가 비어있음");
+            return;
+        }
+
+        // 현재 인덱스가 없으면 0번부터 시작
+        int nextIndex = currentIndex >= 0 ? currentIndex + 1 : 0;
+        if (nextIndex >= bgmList.Count)
+            nextIndex = 0;
+
+        var nextData = bgmList[nextIndex];
+        PlayBGM(nextData.bgmID, fade);
+    }
+
 }

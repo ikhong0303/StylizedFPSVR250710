@@ -13,7 +13,5 @@ public class DoorOpenTrigger : MonoBehaviour
         triggered = true;
 
         doorController.OpenDoor();
-        BgmManager.Instance.PlayBGM("Bgm03", true);
-        Debug.Log("Door Open Triggered");
     }
 }

@@ -10,5 +10,7 @@ public class MadamDialogueTrigger : MonoBehaviour
         if (!other.CompareTag("Player")) return;
         dialogueManager.StartDialogue();
         gameObject.SetActive(false); // 한 번만 발동
+        BgmManager.Instance.PlayBGM("Bgm03", true); // 대화 시작 시 배경음악 변경
+
     }
 }
