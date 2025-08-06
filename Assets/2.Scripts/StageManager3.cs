@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using MikeNspired.XRIStarterKit;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine.Video;
+using UnityEngine.SceneManagement;
 
 public class StageManager3 : MonoBehaviour
 {
@@ -13,6 +16,13 @@ public class StageManager3 : MonoBehaviour
     [SerializeField] private ParticleSystem particleSystemTarget;
     [SerializeField] GameObject bossObject;
     [SerializeField] private BossHealth bossHealth;
+    [SerializeField] private Image blackImage; // Inspector에서 연결
+
+    [Header("비디오 재생 세팅")]
+    public VideoPlayer videoPlayer;   // Inspector에서 할당 (VideoManager의 VideoPlayer)
+    public VideoClip videoClip;       // Inspector에서 할당 (Assets의 mp4)
+    public GameObject videoQuad;      // Inspector에서 할당 (영상 출력할 Quad)
+    private bool hasPlayed = false;   // 한 번만 재생 (중복 방지)
 
 
     private void Start()
@@ -41,7 +51,10 @@ public class StageManager3 : MonoBehaviour
 
     private IEnumerator StageFlow()
     {
+
+        yield return new WaitForSeconds(3f);
         BgmManager.Instance.PlayBGM("Bgm05");
+        StartCoroutine(FadeToAlpha(0f, 4f));
         yield return new WaitForSeconds(3f);
 
         if (missionPopupPanel != null)
@@ -54,6 +67,27 @@ public class StageManager3 : MonoBehaviour
         AudioManager3.Instance.PlayNarration("GardenNarr01");
     }
 
+
+    public IEnumerator FadeToAlpha(float targetAlpha, float duration)
+    {
+        if (blackImage == null) yield break;
+
+        Color color = blackImage.color;
+        float startAlpha = color.a;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            color.a = Mathf.Lerp(startAlpha, targetAlpha, t);
+            blackImage.color = color;
+            yield return null;
+        }
+        // 마지막 값 보정
+        color.a = targetAlpha;
+        blackImage.color = color;
+    }
     private void OnFishSinkStart()
     {
         StartCoroutine(PlayDeathSFXSequence());
@@ -99,8 +133,49 @@ public class StageManager3 : MonoBehaviour
 
         yield return new WaitForSeconds(8f);
         AudioManager3.Instance.PlayNarration("GardenNarr02");
+        yield return new WaitForSeconds(8f);
+        StartCoroutine(FadeToAlpha2(1f, 4f));
+        yield return new WaitForSeconds(5f);
+
+
+        if (videoClip != null && videoPlayer != null)
+        {
+            videoPlayer.clip = videoClip;
+            // 영상 출력 Quad를 보이게 (비활성화 상태였다면)
+            if (videoQuad != null) videoQuad.SetActive(true);
+            videoPlayer.Play();
+            videoPlayer.loopPointReached += OnVideoEnd;  
+        }
 
         yield break; 
+    }
+
+    public IEnumerator FadeToAlpha2(float targetAlpha, float duration)
+    {
+        if (blackImage == null) yield break;
+
+        Color color = blackImage.color;
+        float startAlpha = color.a;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            color.a = Mathf.Lerp(startAlpha, targetAlpha, t);
+            blackImage.color = color;
+            yield return null;
+        }
+        // 마지막 값 보정
+        color.a = targetAlpha;
+        blackImage.color = color;
+    }
+
+    private void OnVideoEnd(VideoPlayer vp)
+    {
+        // 영상 Quad 숨김 (필요시)
+        if (videoQuad != null) videoQuad.SetActive(false);
+
     }
 
     private void OnDestroy()
