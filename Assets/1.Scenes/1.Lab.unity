@@ -19392,7 +19392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2062832743886062038, guid: 5b003cc6e57bf8441acf22254742cf41, type: 3}
       propertyPath: reflectionLayer.m_Bits
-      value: 487
+      value: 495
       objectReference: {fileID: 0}
     - target: {fileID: 8010975151478646126, guid: 5b003cc6e57bf8441acf22254742cf41, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20181,6 +20181,7 @@ GameObject:
   - component: {fileID: 1178299055}
   - component: {fileID: 1178299057}
   - component: {fileID: 1178299056}
+  - component: {fileID: 1178299058}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -20291,6 +20292,22 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
+--- !u!114 &1178299058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178299054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c46b925f65fde34296da21bc03f3f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLight: {fileID: 1178299057}
+  minIntensity: 0
+  maxIntensity: 1
+  duration: 0
 --- !u!1001 &1186794804
 PrefabInstance:
   m_ObjectHideFlags: 0
