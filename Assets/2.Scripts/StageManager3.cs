@@ -95,11 +95,10 @@ public class StageManager3 : MonoBehaviour
 
     private IEnumerator BossDeathSequence()
     {
-        Debug.Log("보스 사망! 여기서부터 코루틴 동작.");
+        BgmManager.Instance.StopBGM();
 
         yield return new WaitForSeconds(8f);
         AudioManager3.Instance.PlayNarration("GardenNarr02");
-        // 원하는 연출, UI, 이펙트 등...
 
         yield break; 
     }
